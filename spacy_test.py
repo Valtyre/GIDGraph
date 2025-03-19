@@ -165,7 +165,7 @@ def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str
     for i in range(len(interactions)):
         knockout = False
         if None in interactions[i]:
-            parsed_interactions. append(interactions[i])
+            # parsed_interactions. append(interactions[i])
             continue
 
         a, r, t, extra = interactions[i]  # Unpack tuple
@@ -182,11 +182,11 @@ def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str
         if r in activation_verbs:
             r = "activates"
         elif r in repression_verbs:
-            r = "represses"
+            r = "inhibits"
 
         if knockout and r == "activates": 
-            r = "represses"
-        elif knockout and r == "represses":
+            r = "inhibits"
+        elif knockout and r == "inhibits":
             r = "activates"
 
         
@@ -195,8 +195,15 @@ def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str
         for a_gene in a_genes:
             for t_gene in t_genes:
                 parsed_interactions.append((a_gene, r, t_gene, extra))
+        
+        inter = ''
+        for i, interaction in enumerate(parsed_interactions): 
+            if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
+                inter += f" {interaction[0]} {interaction[1]} {interaction[2]}. "
+            # elif interaction != None: 
+            #     print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
 
-    return parsed_interactions
+    return inter
 
 
 if __name__ == '__main__':
@@ -222,8 +229,9 @@ if __name__ == '__main__':
 
 
     print(genes)
-    for i, interaction in enumerate(interactions): 
-        if interaction[0] != None and interaction[1] in ["activates", "represses"] and interaction[2] != None:
-            print('\033[0m', f"Interaction {i+1}:", interaction[0], interaction[1], interaction[2], "\t\tOriginal:", interaction[3])
-        elif interaction != None: 
-            print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
+    print(interactions)
+    # for i, interaction in enumerate(interactions): 
+    #     if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
+    #         print('\033[0m', f"Interaction {i+1}:", interaction[0], interaction[1], interaction[2], "\t\tOriginal:", interaction[3])
+    #     elif interaction != None: 
+    #         print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
