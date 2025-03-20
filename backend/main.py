@@ -1,5 +1,6 @@
 import json
-from parser.parser import parse_text  # Import the parsing function
+#from parser.parser import parse_text  # Import the parsing function
+from parser.visParser import vis_parse_text  # Import the parsing function from the visual parser
 from nlp.spacy_test import nlp_runner  # Import the NLP pipeline
 
 def main():
@@ -18,10 +19,11 @@ def main():
     print("🔹 NLP Output:\n", nlp_output)
 
     # Run the parser
-    transformer = parse_text(nlp_output)
+    transformer = vis_parse_text(nlp_output)
 
     # Save the output graph
-    transformer.to_graphml("backend/graphOutputs/gene_network.graphml")
+    #transformer.to_graphml("backend/graphOutputs/gene_network.graphml")
+    transformer.to_json("backend/graphOutputs/gene_network.json")
 
 
     print("\n✅ Parsing complete! GraphML file generated.")
