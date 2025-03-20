@@ -10,46 +10,34 @@ model = AutoModelForTokenClassification.from_pretrained(model_name)
 ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer)
 
 def extract_genes(text):
-    """Extract gene mentions from text using BioBERT, properly handling hyphens and numbers."""
+    # Extract gene mentions from text using BioBERT, properly handling hyphens and numbers. 
     ner_results = ner_pipeline(text)
     
     merged_genes = []
     current_gene = ""
-    current_start = None
-    current_end = None
-    confidence_scores = []
 
     for entity in ner_results:
         word = entity["word"]
-        start, end = entity["start"], entity["end"]
-        score = entity["score"]
+        if word in "genes": 
+            continue
 
         # Check if token is a subword or part of a gene name
         if word.startswith("##"):
             current_gene += word[2:]  # Remove '##' and append
-            current_end = end
-            confidence_scores.append(score)
         elif word in ["-", "/", "."] or word.isdigit():
             # Merge standalone hyphens, slashes, dots, and numbers into the current gene
             current_gene += word
-            current_end = end
-            confidence_scores.append(score)
         else:
             # Store previous gene
             if current_gene:
                 merged_genes.append(current_gene)
-                # merged_genes.append((current_gene, current_start, current_end, sum(confidence_scores) / len(confidence_scores)))
 
             # Start a new gene entity
             current_gene = word
-            current_start = start
-            current_end = end
-            confidence_scores = [score]
 
     # Add the last gene entity
     if current_gene:
         merged_genes.append(current_gene)
-        # merged_genes.append((current_gene, current_start, current_end, sum(confidence_scores) / len(confidence_scores)))
 
     return list(set(merged_genes))
 
