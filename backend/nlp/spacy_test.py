@@ -3,7 +3,7 @@ from spacy.tokenizer import Tokenizer
 import scispacy
 import numpy as np
 from spacy.tokens.doc import Doc
-from biobert_genetic_ner import extract_genes
+from nlp.biobert_genetic_ner import extract_genes
 import re
 
 
@@ -204,6 +204,17 @@ def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str
             #     print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
 
     return inter
+
+
+def nlp_runner(text: str) -> str:
+    nlp = spacy.load("en_ner_bionlp13cg_md")
+    nlp.tokenizer = geneTokenizer(nlp)
+    doc = nlp(text)
+
+    genes = extract_genes(text)
+    interactions =  to_parser(main_function(doc, genes), genes)
+
+    return interactions
 
 
 if __name__ == '__main__':
