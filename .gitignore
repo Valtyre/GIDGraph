@@ -2,3 +2,7 @@
 
 # Directories
 /SpaCyEnv
+/backend/graphOutputs
+
+#Caches
+/backend/parser/__pycache__

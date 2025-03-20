@@ -21,7 +21,8 @@ def main():
     transformer = parse_text(nlp_output)
 
     # Save the output graph
-    transformer.to_graphml("gene_network.graphml")
+    transformer.to_graphml("backend/graphOutputs/gene_network.graphml")
+
 
     print("\n✅ Parsing complete! GraphML file generated.")
 
