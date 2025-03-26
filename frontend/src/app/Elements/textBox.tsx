@@ -1,4 +1,3 @@
-import { skip } from "node:test";
 import { useState } from "react";
 
 export default function TextBox({ header, fun }: { header: string; fun?: (arg0: string) => void }) {
@@ -7,7 +6,7 @@ export default function TextBox({ header, fun }: { header: string; fun?: (arg0: 
   return (
     <>
       <div className="flex flex-col mx-auto w-full p-5 gap-1"> 
-        <h1 className=" font-bold text-3xl">
+        <h1 className=" font-bold text-3xl text-white">
           {header}
         </h1>
         <textarea

@@ -3,7 +3,7 @@ from spacy.tokenizer import Tokenizer
 import scispacy
 import numpy as np
 from spacy.tokens.doc import Doc
-from nlp.biobert_genetic_ner import extract_genes
+from biobert_genetic_ner import extract_genes
 import re
 
 
@@ -74,6 +74,8 @@ def main_function(doc: Doc, gene_list: list) -> list[tuple[str, str, str, str]]:
         actor = None 
         target = None
         flip = False
+        if_clause = None 
+        main_clause = None 
 
         for token in sent:
             print(token, token.dep_, token.head, token.pos_)
@@ -106,6 +108,42 @@ def main_function(doc: Doc, gene_list: list) -> list[tuple[str, str, str, str]]:
 
             elif token.dep_ == "advcl" and token.head.dep_ in ["ROOT", "contributes"]:
                 root = token.text
+
+
+            if token.text.lower() == "if":
+                if_clause = token.head  # e.g. "active"
+            elif token.text.lower() == "then":
+                main_clause = token.head  # e.g. "repressed"
+
+            # Extract condition gene
+            if if_clause != None and token.head == if_clause and token.dep_ == "nsubj":
+                for child in token.children:
+                    if child.dep_ == "compound" and child.text in gene_list:
+                        condition_gene = child.text
+
+            # Extract effect gene
+            if main_clause != None and token.head == main_clause and token.dep_ in ["nsubj", "nsubjpass"]:
+                if token.text in gene_list:
+                    effect_gene = token.text
+
+
+            # Detect negation in outcome
+            if token.dep_ == "neg" and token.head == main_clause:
+                effect_negated = True
+            if token.dep_ == "neg" and token.head == if_clause:
+                condition_negated = True
+
+            
+            if condition_gene and effect_gene:
+                if effect_negated:
+                    relation = "represses"
+                else:
+                    relation = "activates"
+
+                # Flip direction if the condition gene is knocked out
+                relationships.append((condition_gene, relation, effect_gene, sent))
+
+
             elif token.dep_ == "case":
                 if token.text in ["by", "via", "in"]:
                     # Get the actual head token (e.g., "knockout" in "GENE knockout")
@@ -224,7 +262,7 @@ if __name__ == '__main__':
 
     nlp.tokenizer = geneTokenizer(nlp)
 
-    text1 = """GATA46 enhances HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout.IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling."""
+    text1 = """If TBX5 knockout is active, then GATA46 is not repressed. GATA46 enhances HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout.IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling."""
 
     text2 ="TBX5 enhances GATA4 expression. GATA6 directly activates NKX2-5 expression. MEF2C contributes to activating HAND1. HEY2 represses IRX3 gene expression. NOTCH signaling activates JAG1 expression. IRX3 represses HAND2. NKX2-5 enhances MYH6 expression. TBX20 binds to regulatory regions of MYL7 and promotes its expression. Expression of HEY2 is repressed by TBX5. Ectopic HAND2 expression is observed in GATA4 knockout embryonic hearts. GATA4 and NKX2-5 synergistically activate BMP10 expression. HEY2 expression is negatively regulated by MEIS1. FOXC1 represses HAND1 gene expression. GATA6 enhances BMP4 expression in cardiac progenitors. Loss of TBX5 leads to decreased expression of NPPA. BMP10 activates expression of HAND2 in cardiac development. IRX4 and TBX5 cooperatively activate MYH7 expression. NOTCH signaling inhibits TBX20 expression in the developing heart. NR2F2 represses NKX2-5 transcription. GATA4 directly activates MEF2C expression."
     
