@@ -1,5 +1,5 @@
 'use client'
-import { useComputed } from "@preact/signals-react";
+
 import GeneInteractionBubble from "./geneInteractionBubble";
 import { useEffect, useRef, useState } from "react";
 

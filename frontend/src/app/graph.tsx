@@ -20,7 +20,7 @@ interface VisEdge extends Edge {
 }
 
 const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ fileName }) => {
-  const networkRef = useRef<HTMLDivElement>(null);
+const networkRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (networkRef.current) {
