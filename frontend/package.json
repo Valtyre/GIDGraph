@@ -14,6 +14,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-use-signal": "^1.0.14",
+    "vis": "^4.21.0",
     "vis-network": "^9.1.9"
   },
   "devDependencies": {
