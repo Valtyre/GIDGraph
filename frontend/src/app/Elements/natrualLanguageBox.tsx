@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function TextBox({ header, fun }: { header: string; fun?: (arg0: string) => void }) {
+export default function NatrualLanguageBox({ header, fun }: { header: string; fun?: (arg0: string) => void }) {
   const [text, setText] = useState("");
 
   return (
