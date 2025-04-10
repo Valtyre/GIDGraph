@@ -3,7 +3,7 @@
 # Directories
 /SpaCyEnv
 .env
-/backend/graphOutputs
+#/backend/graphOutputs
 
 #Caches
 /backend/parser/__pycache__
