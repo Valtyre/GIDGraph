@@ -2,7 +2,7 @@
 
 
 export async function getGeneInteractions(text: string): Promise<string> {
-    const response = await fetch("https://vercel-python-api-iota.vercel.app/api/nlp_request", {
+    const response = await fetch("https://vercel-python-api-iota.vercel.app/api/greet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: text }), // Use `text` instead of hardcoded "Alice"

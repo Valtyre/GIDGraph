@@ -3,7 +3,7 @@ from spacy.tokenizer import Tokenizer
 import scispacy
 import numpy as np
 from spacy.tokens.doc import Doc
-from biobert_genetic_ner import extract_genes
+from .biobert_genetic_ner import extract_genes
 import re
 
 
@@ -109,39 +109,6 @@ def main_function(doc: Doc, gene_list: list) -> list[tuple[str, str, str, str]]:
             elif token.dep_ == "advcl" and token.head.dep_ in ["ROOT", "contributes"]:
                 root = token.text
 
-
-            if token.text.lower() == "if":
-                if_clause = token.head  # e.g. "active"
-            elif token.text.lower() == "then":
-                main_clause = token.head  # e.g. "repressed"
-
-            # Extract condition gene
-            if if_clause != None and token.head == if_clause and token.dep_ == "nsubj":
-                for child in token.children:
-                    if child.dep_ == "compound" and child.text in gene_list:
-                        condition_gene = child.text
-
-            # Extract effect gene
-            if main_clause != None and token.head == main_clause and token.dep_ in ["nsubj", "nsubjpass"]:
-                if token.text in gene_list:
-                    effect_gene = token.text
-
-
-            # Detect negation in outcome
-            if token.dep_ == "neg" and token.head == main_clause:
-                effect_negated = True
-            if token.dep_ == "neg" and token.head == if_clause:
-                condition_negated = True
-
-            
-            if condition_gene and effect_gene:
-                if effect_negated:
-                    relation = "represses"
-                else:
-                    relation = "activates"
-
-                # Flip direction if the condition gene is knocked out
-                relationships.append((condition_gene, relation, effect_gene, sent))
 
 
             elif token.dep_ == "case":

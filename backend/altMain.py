@@ -1,3 +1,5 @@
+# file: backend/main.py
+
 import json
 import sys
 import time
@@ -7,8 +9,10 @@ import http.server
 import socketserver
 import os
 
-from parser.visParser import vis_parse_text  # Import the parsing function from the visual parser
-from nlp.spacy_test import nlp_runner      # Import the NLP pipeline
+### CHANGED ###
+# Instead of importing from parser directly, import process_nl_text
+# from parser_manager (the new file).
+from .parser_manager import process_nl_text
 
 PORT = 8000
 URL = f"http://localhost:{PORT}/betterGraphTester.html"
@@ -27,7 +31,7 @@ def open_browser(url):
 
 def main():
     # -------------------------
-    # Step 1: Run the parser
+    # Step 1: Read Input from nl_texts.json
     # -------------------------
     try:
         with open("backend/nlp/nl_texts.json", "r") as file:
@@ -36,19 +40,22 @@ def main():
         print("Error: The file 'nl_texts.json' was not found.")
         sys.exit(1)
 
-    # Run NLP pipeline and get structured text
-    nlp_output = nlp_runner(data["text3"])
+    # We'll parse data["text3"] as before, but use our new function.
+    natural_language = data["text3"]
+
+    ### CHANGED ###
+    # Step 2: Use process_nl_text instead of manual calls to nlp_runner + vis_parse_text
+    nlp_output, graph_dict = process_nl_text(natural_language)
     print("🔹 NLP Output:\n", nlp_output)
 
-    # Run the parser (vis parser) and generate the JSON graph
-    transformer = vis_parse_text(nlp_output)
-    transformer.to_json("backend/graphOutputs/gene_network.json")
-    print("\n✅ Parsing complete! JSON file generated.")
+    # If you still want a JSON file on disk, write it here:
+    with open("backend/graphOutputs/gene_network.json", "w") as f:
+        json.dump(graph_dict, f, indent=4)
+    print("\n✅ Parsing complete! JSON file generated in 'backend/graphOutputs/gene_network.json'.")
 
     # -------------------------
-    # Step 2: Start HTTP Server and Open Browser
+    # Step 3: Start HTTP Server and Open Browser
     # -------------------------
-    # Start the HTTP server in a separate thread.
     server_thread = threading.Thread(target=run_http_server, daemon=True)
     server_thread.start()
 

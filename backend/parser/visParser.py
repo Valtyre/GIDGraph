@@ -67,7 +67,18 @@ class GeneTransformer(Transformer):
         """
         Exports the graph to a JSON file in a vis.js compatible format.
         """
-        nodes = [{"id": node, "label": node, "color": "#727a8a"} for node in self.graph.nodes]
+        graph_data = self.get_vis_data()  # <-- We'll reuse the new helper method
+        with open(filename, "w") as f:
+            json.dump(graph_data, f, indent=4)
+        print(f"Graph JSON saved as {filename}")
+
+    def get_vis_data(self):
+        """
+        Returns the graph in a vis.js-friendly dictionary (without writing to file).
+        """
+        nodes = [{"id": node, "label": node, "color": "#727a8a"} 
+                 for node in self.graph.nodes]
+        
         edges = []
         for u, v, d in self.graph.edges(data=True):
             edge_data = {
@@ -76,20 +87,16 @@ class GeneTransformer(Transformer):
                 "label": d.get("label", ""),
                 "color": d.get("color", "gray")
             }
-            # Determine arrow style based on label
             if d.get("label") == "activation":
                 edge_data["arrows"] = "to"
             elif d.get("label") == "inhibition":
                 edge_data["arrows"] = {"to": {"type": "bar"}}
             else:
-                edge_data["arrows"] = {}  # Default (no arrow) for other interactions
+                edge_data["arrows"] = {}
 
             edges.append(edge_data)
 
-        graph_data = {"nodes": nodes, "edges": edges}
-        with open(filename, "w") as f:
-            json.dump(graph_data, f, indent=4)
-        print(f"Graph JSON saved as {filename}")
+        return {"nodes": nodes, "edges": edges}
 
 def vis_parse_text(input_text: str) -> GeneTransformer:
     """
