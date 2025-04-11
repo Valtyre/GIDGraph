@@ -11,11 +11,11 @@ type Props = {
 export default function GeneInteractionBubble({ interaction, onFlip, onToggleType, onRemove }: Props) {
   
   
-  const { source, target, type } = interaction;
+  const { from, label, to } = interaction;
 
 
   const buttonColor =
-    type === InteractionType.activation
+    label === InteractionType.activation
       ? 'bg-green-500 hover:bg-green-600'
       : 'bg-red-500 hover:bg-red-600';
 
@@ -29,14 +29,14 @@ export default function GeneInteractionBubble({ interaction, onFlip, onToggleTyp
         ×
       </button>
 
-      <span className="text-center flex-1 text-2xl">{source}</span>
+      <span className="text-center flex-1 text-2xl">{from}</span>
 
       <div className="flex flex-col items-center gap-2">
         <button
           className={`border-gray-400 rounded-md px-3 py-1 min-w-25 ${buttonColor}`}
           onClick={onToggleType}
         >
-          {type === InteractionType.activation ? 'activates' : 'inhibits'}
+          {label === InteractionType.activation ? 'activates' : 'inhibits'}
         </button>
 
         <button
@@ -47,7 +47,7 @@ export default function GeneInteractionBubble({ interaction, onFlip, onToggleTyp
         </button>
       </div>
 
-      <span className="text-center flex-1 text-2xl">{target}</span>
+      <span className="text-center flex-1 text-2xl">{to}</span>
     </div>
   );
 }

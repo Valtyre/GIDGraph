@@ -39,7 +39,7 @@ def parse_text(input_data: TextInput):
 
     # 2) Return JSON to the client
     return {
-        "snl": nlp_output,
+        # "snl": nlp_output,
         "graph": graph_dict
     }
 

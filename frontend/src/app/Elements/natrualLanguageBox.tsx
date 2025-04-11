@@ -16,7 +16,10 @@ export default function NatrualLanguageBox({ header, fun }: { header: string; fu
           placeholder="Enter text here"
         />
         <button 
-          onClick={() => fun?.(text)} 
+          onClick={() => {
+            fun?.(text); 
+            console.log("click")
+          }} 
           className="bg-white border-black border-2 rounded-sm mt-4 p-2 w-fit">
           Submit
         </button>

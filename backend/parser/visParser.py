@@ -42,16 +42,12 @@ class GeneTransformer(Transformer):
     def activation(self, items):
         source, target = items
         self.graph.add_edge(source, target,
-                            label="activation",
-                            color="green",
-                            arrowhead="to")
+                            label="activation")
 
     def inhibition(self, items):
         source, target = items
         self.graph.add_edge(source, target,
-                            label="inhibition",
-                            color="red",
-                            arrowhead="bar")
+                            label="inhibition")
 
     def knockout(self, items):
         source, target = items
@@ -76,7 +72,7 @@ class GeneTransformer(Transformer):
         """
         Returns the graph in a vis.js-friendly dictionary (without writing to file).
         """
-        nodes = [{"id": node, "label": node, "color": "#727a8a"} 
+        nodes = [{"id": node, "label": node} 
                  for node in self.graph.nodes]
         
         edges = []
@@ -85,14 +81,8 @@ class GeneTransformer(Transformer):
                 "from": u,
                 "to": v,
                 "label": d.get("label", ""),
-                "color": d.get("color", "gray")
             }
-            if d.get("label") == "activation":
-                edge_data["arrows"] = "to"
-            elif d.get("label") == "inhibition":
-                edge_data["arrows"] = {"to": {"type": "bar"}}
-            else:
-                edge_data["arrows"] = {}
+
 
             edges.append(edge_data)
 

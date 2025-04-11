@@ -9,22 +9,15 @@ export enum InteractionType {
 }
 
 export type Interaction = {
-    source: string, 
-    type: InteractionType, 
-    target: string,
-    id: number
+  from: string,
+  to: string, 
+  label: InteractionType, 
+  id: number
 }
 
-const geneInteractions = [
-  { source: "gene1", target: "gene5", type: InteractionType.activation },
-  { source: "gene2", target: "gene6", type: InteractionType.inhibition },
-  { source: "gene3", target: "gene7", type: InteractionType.activation },
-  { source: "gene4", target: "gene8", type: InteractionType.activation },
-];
 
 
-
-export function SNLBox() {
+export function SNLBox({geneInteractions}: {geneInteractions: Interaction[]}) {
   
   const [SemiNaturalLanguage, setSemiNaturalLanguage] = useState<Interaction[]>([])
 
@@ -34,63 +27,64 @@ export function SNLBox() {
   useEffect( () => {
     geneInteractions.forEach(element => {createInteraction(element)
     }); 
-  }, [])
-  
+  }, [geneInteractions])
 
-const interactionTemplate = {source: "", type: InteractionType.activation, target: ""}
+  console.log("SEMI:", SemiNaturalLanguage)
+
+  const interactionTemplate = {from: "", label: InteractionType.activation, to: ""}
 
 
-function flipInteraction(interaction: Interaction): void {
-  const snl = [...SemiNaturalLanguage];
-  const index = snl.findIndex((i) => i.id === interaction.id);
+  function flipInteraction(interaction: Interaction): void {
+    const snl = [...SemiNaturalLanguage];
+    const index = snl.findIndex((i) => i.id === interaction.id);
 
-  if (index !== -1) {
-    const current = snl[index];
-    snl[index] = {
-      ...current,
-      source: current.target,
-      target: current.source,
-    };
-    setSemiNaturalLanguage(snl);
+    if (index !== -1) {
+      const current = snl[index];
+      snl[index] = {
+        ...current,
+        from: current.to,
+        to: current.from,
+      };
+      setSemiNaturalLanguage(snl);
+    }
+    console.log(SemiNaturalLanguage)
   }
-  console.log(SemiNaturalLanguage)
-}
 
-function toggleType(interaction: Interaction): void {
-  const snl = [...SemiNaturalLanguage];
-  const index = snl.findIndex((i) => i.id === interaction.id);
+  function toggleType(interaction: Interaction): void {
+    const snl = [...SemiNaturalLanguage];
+    const index = snl.findIndex((i) => i.id === interaction.id);
+      
+    if (index !== -1) {
+      const current = snl[index];
+      snl[index] = {
+        ...current,
+        label: interaction.label == InteractionType.activation ? InteractionType.inhibition : InteractionType.activation,
+      };
+      setSemiNaturalLanguage(snl);
+    }
+    console.log(SemiNaturalLanguage)
+  }
+
+
+  function createInteraction(i: { from: string; label: InteractionType; to: string }) {
+    setSemiNaturalLanguage(prev => [
+      ...prev,
+      {
+        id: uniqueID.current++,
+        ...i,
+      },
+    ]);
+  }
+
+
+  function addInteraction(){
+      createInteraction(interactionTemplate)
+  }
+
+  function removeInteraction(i: Interaction): void {
+      setSemiNaturalLanguage(SemiNaturalLanguage.filter((int) => int.id !== i.id))
+    }
     
-  if (index !== -1) {
-    const current = snl[index];
-    snl[index] = {
-      ...current,
-      type: interaction.type == InteractionType.activation ? InteractionType.inhibition : InteractionType.activation,
-    };
-    setSemiNaturalLanguage(snl);
-  }
-  console.log(SemiNaturalLanguage)
-}
-
-
-function createInteraction(i: { source: string; type: InteractionType; target: string }) {
-  setSemiNaturalLanguage(prev => [
-    ...prev,
-    {
-      id: uniqueID.current++,
-      ...i,
-    },
-  ]);
-}
-
-
-function addInteraction(){
-    createInteraction(interactionTemplate)
-}
-
-function removeInteraction(i: Interaction): void {
-    setSemiNaturalLanguage(SemiNaturalLanguage.filter((int) => int.id !== i.id))
-  }
-  
 
 
   return (
