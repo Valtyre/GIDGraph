@@ -1,75 +1,96 @@
 import React, { useEffect, useRef } from 'react';
 import { DataSet, Network, Node, Edge } from 'vis-network/standalone';
+import { Interaction, InteractionType } from './Elements/SNL/snlBox'; // Adjust the path if needed
 
-interface GeneNetworkGraphProps {
-  fileName: string; // The path to the JSON graph file
-}
-
-// Extend Node and Edge types if needed, or define them to match your JSON structure.
 interface VisNode extends Node {
-  id: number | string; // Ensure id is non-nll (adjust the type if your ids are numbers or strings)
+  id: string;
   label?: string;
-
 }
 
 interface VisEdge extends Edge {
-  id?: number | string;
-  from: number | string;
-  to: number | string;
-  // Add additional edge properties if needed
+  from: string;
+  to: string;
+  label?: string;
+  color?: string;
+  arrows?: string;
 }
 
-const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ fileName }) => {
-const networkRef = useRef<HTMLDivElement>(null);
+interface Graph {
+  edges: Interaction[];
+  node: string;
+}
+
+interface GeneNetworkGraphProps {
+  graph: Graph | null;
+}
+
+const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph }) => {
+  const networkRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (networkRef.current) {
-      fetch(fileName)
-        .then((response) => response.json())
-        .then((data) => {
-          // Explicitly type the nodes and edges from your JSON data.
-          const nodes = new DataSet<VisNode>(data.nodes);
-          const edges = new DataSet<VisEdge>(data.edges);
+    if (!networkRef.current || !graph) return;
 
-          const graphData = { nodes, edges };
+    // Build unique set of nodes from edges
+    const nodeIds = new Set<string>();
+    graph.edges.forEach(edge => {
+      nodeIds.add(edge.from);
+      nodeIds.add(edge.to);
+    });
 
-          // Define network options
-          const options = {
-            physics: {
-              enabled: true,
-              barnesHut: {
-                gravitationalConstant: -2000,
-                centralGravity: 0.3,
-                springLength: 95,
-              },
-            },
-            nodes: {
-              shape: 'box',
-              shapeProperties: {
-                borderRadius: 5, // Rounded corners
-              },
-              font: {
-                color: '#ffffff',
-                size: 16,
-                face: 'Arial',
-                vadjust: 1.5,
-              },
-            },
-            edges: {
-              font: { size: 0 },
-            },
-          };
+    const nodes: VisNode[] = Array.from(nodeIds).map(id => ({
+      id,
+      label: id,
+    }));
 
-          // Create a network instance in the designated container.
-          if (networkRef.current != null) {new Network(networkRef.current, graphData, options);}
-        })
-        .catch((error) => console.error('Error loading JSON file:', error));
-    }
-  }, [fileName]);
+    const edges: VisEdge[] = graph.edges.map(edge => ({
+      from: edge.from,
+      to: edge.to,
+      label: edge.label,
+      color: edge.label == "activation" ? "green" : "red",
+      arrows: edge.label == "activation" ? "to" : "",
+    }));
+
+    const visNodes = new DataSet<VisNode>(nodes);
+    const visEdges = new DataSet<VisEdge>(edges);
+
+    const data = { nodes: visNodes, edges: visEdges };
+
+    const options = {
+      physics: {
+        enabled: true,
+        barnesHut: {
+          gravitationalConstant: -2000,
+          centralGravity: 0.3,
+          springLength: 95,
+        },
+      },
+      nodes: {
+        shape: 'box',
+        shapeProperties: {
+          borderRadius: 5,
+        },
+        font: {
+          color: '#ffffff',
+          size: 16,
+          face: 'Arial',
+          vadjust: 1.5,
+        },
+      },
+      edges: {
+        font: { size: 0 },
+      },
+    };
+
+    new Network(networkRef.current, data, options);
+  }, [graph]);
 
   return (
     <div className="p-5 bg-midnight">
-      <div id="network" className='w-9/10 max-w-[800px] h-[600px] m-auto bg-graph shadow-[0_4px_8px_rgba(0,0,0,0.4)]' ref={networkRef} />
+      <div
+        id="network"
+        className="w-9/10 max-w-[800px] h-[600px] m-auto bg-graph shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+        ref={networkRef}
+      />
     </div>
   );
 };

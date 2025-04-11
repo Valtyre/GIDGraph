@@ -4,9 +4,10 @@ import GeneInteractionBubble from "./geneInteractionBubble";
 import { useEffect, useRef, useState } from "react";
 
 export enum InteractionType {
-    activation, 
-    inhibition
+  activation = "activation",
+  inhibition = "inhibition"
 }
+
 
 export type Interaction = {
   from: string,

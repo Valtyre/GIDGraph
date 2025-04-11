@@ -5,10 +5,13 @@ import { Interaction, SNLBox } from "./Elements/SNL/snlBox";
 import NatrualLanguageBox from "./Elements/natrualLanguageBox";
 import GeneNetworkGraph from "./graph";
 
-
+export type Graph = {
+  edges: Interaction[],
+  node: string
+}
 
 export default function Home() {
-  const [geneInteractions, setGeneInteractions] = useState<Interaction[]>([]);
+  const [graph, setGraph] = useState<Graph | null>(null);
 
   function getSNL(str: string) {
     fetch("http://localhost:8000/api/parse", {
@@ -17,9 +20,9 @@ export default function Home() {
       body: JSON.stringify({ text: `"${str}"` }),
     })
       .then(response => response.json())
-      .then((data: { graph: { edges: Interaction[] } }) => {
-        setGeneInteractions(data.graph.edges);
-        console.log(data.graph.edges)
+      .then((data: { graph: Graph }) => {
+        setGraph(data.graph);
+        console.log("Graph edges:", data.graph.edges);
       })
       .catch(error => {
         console.error("Error fetching SNL data:", error);
@@ -31,9 +34,10 @@ export default function Home() {
       <TopBar />
       <div className="flex flex-row bg-blue-950 p-5 h-[400px]">
         <NatrualLanguageBox header="GID" fun={getSNL} />
-        <SNLBox geneInteractions={geneInteractions} />
+        <SNLBox geneInteractions={graph?.edges ?? []} />
+        {/* <SNLBox geneInteractions={graph?.edges?? []}  onUpdate={(newEdges) => setGraph({...graph, edges: newEdges})} /> */}
       </div>
-      <GeneNetworkGraph fileName={""} />
+      <GeneNetworkGraph graph={graph} />
     </div>
   );
 }
