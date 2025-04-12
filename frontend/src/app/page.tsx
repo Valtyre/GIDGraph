@@ -12,6 +12,7 @@ export type Graph = {
 
 export default function Home() {
   const [graph, setGraph] = useState<Graph | null>(null);
+  const emptyG: Graph = {node: "", edges: []}
 
   function getSNL(str: string) {
     fetch("http://localhost:8000/api/parse", {
@@ -34,8 +35,7 @@ export default function Home() {
       <TopBar />
       <div className="flex flex-row bg-blue-950 p-5 h-[400px]">
         <NatrualLanguageBox header="GID" fun={getSNL} />
-        <SNLBox geneInteractions={graph?.edges ?? []} />
-        {/* <SNLBox geneInteractions={graph?.edges?? []}  onUpdate={(newEdges) => setGraph({...graph, edges: newEdges})} /> */}
+        <SNLBox graph={graph ?? emptyG} setGeneList={setGraph} />
       </div>
       <GeneNetworkGraph graph={graph} />
     </div>
