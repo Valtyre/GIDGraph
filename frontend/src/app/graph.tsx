@@ -12,8 +12,25 @@ interface VisEdge extends Edge {
   to: string;
   label?: string;
   color?: string;
-  arrows?: string;
+  arrows?: string | {
+    to?: {
+      enabled: boolean;
+      type?: 'arrow' | 'bar' | 'circle' | 'image';
+      scaleFactor?: number;
+    };
+    from?: {
+      enabled: boolean;
+      type?: 'arrow' | 'bar' | 'circle' | 'image';
+      scaleFactor?: number;
+    };
+    middle?: {
+      enabled: boolean;
+      type?: 'arrow' | 'bar' | 'circle' | 'image';
+      scaleFactor?: number;
+    };
+  };
 }
+
 
 interface Graph {
   edges: Interaction[];
@@ -22,9 +39,10 @@ interface Graph {
 
 interface GeneNetworkGraphProps {
   graph: Graph | null;
+  geneColors: Record<string, string>;
 }
 
-const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph }) => {
+const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }) => {
   const networkRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,15 +58,28 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph }) => {
     const nodes: VisNode[] = Array.from(nodeIds).map(id => ({
       id,
       label: id,
+      /* pastel background, dark border */
+      color: {
+        background: geneColors[id] ?? '#6b7280',
+        border: '#1f2937',
+        highlight: { background: geneColors[id] ?? '#6b7280' },
+      },
     }));
 
     const edges: VisEdge[] = graph.edges.map(edge => ({
       from: edge.from,
       to: edge.to,
       label: edge.label,
-      color: edge.label == "activation" ? "green" : "red",
-      arrows: edge.label == "activation" ? "to" : "",
+      color: edge.label === "activation" ? "green" : "red",
+      arrows: {
+        to: {
+          enabled: true,
+          type: edge.label === "activation" ? "arrow" : "bar",
+          scaleFactor: 1,
+        },
+      },
     }));
+    
 
     const visNodes = new DataSet<VisNode>(nodes);
     const visEdges = new DataSet<VisEdge>(edges);
@@ -67,7 +98,7 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph }) => {
       nodes: {
         shape: 'box',
         shapeProperties: {
-          borderRadius: 5,
+          borderRadius: 7,
         },
         font: {
           color: '#ffffff',
@@ -82,14 +113,14 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph }) => {
     };
 
     new Network(networkRef.current, data, options);
-  }, [graph]);
+  }, [graph, geneColors]);
 
   return (
-    <div className="p-5 bg-midnight">
+    <div className="p-5 bg-midnight h-full w-full flex-1">
       <div
         id="network"
-        className="w-9/10 max-w-[800px] h-[600px] m-auto bg-graph shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
         ref={networkRef}
+        className="w-full h-[600px] bg-graph shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
       />
     </div>
   );
