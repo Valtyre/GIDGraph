@@ -116,11 +116,11 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
   }, [graph, geneColors]);
 
   return (
-    <div className="p-5 bg-midnight h-full w-full flex-1">
+    <div className="p-5 h-full w-full flex-1">
       <div
         id="network"
         ref={networkRef}
-        className="w-full h-[600px] bg-graph shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+        className="w-full h-[600px] bg-second shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
       />
     </div>
   );

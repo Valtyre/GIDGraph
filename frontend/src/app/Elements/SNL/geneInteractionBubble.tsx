@@ -30,17 +30,18 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
       : 'bg-red-500 hover:bg-red-600';
 
   return (
-    <div className="relative flex items-center justify-center mx-auto w-full p-5 gap-5 bg-blue-200 rounded-md">
+    <div className="flex w-full max-w-[800px] mx-auto items-center gap-3 p-3 bg-second rounded-md relative">
       <button
-        className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-sm font-bold"
+        className=" py-1 text-4xl font-bold text-main hover:text-red-600"
         onClick={onRemove}
         aria-label="Delete"
       >
         ×
       </button>
 
+
       <input type="text"
-        className= "text-center bg-white flex-1 text-2xl text-black"
+        className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
         style={{ border: `5px solid ${fromColor}` }}    
         value={textFrom}
         onChange={(e) => {
@@ -54,7 +55,7 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
 
       <div className="flex flex-col items-center gap-2">
         <button
-          className={`border-gray-400 rounded-md px-3 py-1 min-w-25 ${buttonColor}`}
+          className={`border-gray-400 rounded-md px-3 py-1 min-w-20 ${buttonColor}`}
           onClick={onToggleType}
         >
           {label == "activation" ? 'activates' : 'inhibits'}
@@ -69,7 +70,7 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
       </div>
 
       <input type="text"
-        className= "text-center bg-white flex-1 text-2xl text-black"
+        className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
         style={{ border: `5px solid ${toColor}` }}    
         value={textTo}
         onChange={(e) => {
