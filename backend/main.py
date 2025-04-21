@@ -1,7 +1,7 @@
 import json
 #from parser.parser import parse_text  # Import the parsing function
 from parser.visParser import vis_parse_text  # Import the parsing function from the visual parser
-from nlp.spacy_test import nlp_runner  # Import the NLP pipeline
+from backend.nlp.natural_language_processor import nlp_runner  # Import the NLP pipeline
 
 def main():
     # Load NLP text from JSON

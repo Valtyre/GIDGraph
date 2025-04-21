@@ -3,7 +3,7 @@ import sys
 import json
 
 # Import existing NLP and parser functions
-from .nlp.spacy_test import nlp_runner
+from .nlp.natural_language_processor import nlp_runner
 from .parser.visParser import vis_parse_text
 
 def process_nl_text(nl_text: str):
