@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { DataSet, Network, Node, Edge } from 'vis-network/standalone';
-import { Interaction, InteractionType } from './Elements/SNL/snlBox'; // Adjust the path if needed
+import { Interaction, InteractionType } from './SNL/snlBox'; // Adjust the path if needed
 
 interface VisNode extends Node {
   id: string;

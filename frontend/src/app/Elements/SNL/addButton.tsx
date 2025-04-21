@@ -1,11 +1,12 @@
 
 
 
-export function addButton({add} : {add: () => void}){
+export function AddButton({add} : {add: () => void}){
 
     return (
-        <button>
-
+        <button className="bg-amber-300 rounded-2xl w-[50%] m-auto"
+        onClick={add}>
+            Add Interaction
         </button>
     )
 }

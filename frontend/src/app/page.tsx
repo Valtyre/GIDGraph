@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 import TopBar from './Elements/TopBar';
 import NatrualLanguageBox from './Elements/natrualLanguageBox';
 import { SNLBox, Interaction } from './Elements/SNL/snlBox';
-import GeneNetworkGraph from './graph';
+import GeneNetworkGraph from './Elements/graph';
 import LogicalFormulasContainer, {
   LogicalFormula as LF,
 } from './Elements/logicalFormulas/lfContainer';
@@ -94,7 +94,11 @@ export default function Home() {
       {/* input area: natural language + SNL editor */}
       <div className="flex flex-row bg-blue-950 p-5 h-[400px]">
         <NatrualLanguageBox header="GID" fun={fetchGraph} />
-        <SNLBox graph={graph ?? emptyGraph} setGeneList={setGraph} />
+        <SNLBox 
+          graph={graph ?? emptyGraph} 
+          setGeneList={setGraph}
+          geneColors={geneColors}
+        />
       </div>
 
       {/* main content: graph (65 %)  |  logical formulas (35 %) */}
