@@ -1,8 +1,8 @@
 export default function TopBar() {
 
   return (
-    <div className="w-full bg-blue-400">
-        <h1 className="text-white text-5xl p-5">
+    <div className="w-full bg-second">
+        <h1 className="text-main text-5xl p-5">
             GIDGraph
         </h1>
     </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { DataSet, Network, Node, Edge } from 'vis-network/standalone';
-import { Interaction, InteractionType } from './Elements/SNL/snlBox'; // Adjust the path if needed
+import { Interaction, InteractionType } from './SNL/snlBox'; // Adjust the path if needed
 
 interface VisNode extends Node {
   id: string;
@@ -116,11 +116,11 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
   }, [graph, geneColors]);
 
   return (
-    <div className="p-5 bg-midnight h-full w-full flex-1">
+    <div className="p-5 h-full w-full flex-1">
       <div
         id="network"
         ref={networkRef}
-        className="w-full h-[600px] bg-graph shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+        className="w-full h-[600px] bg-second shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
       />
     </div>
   );

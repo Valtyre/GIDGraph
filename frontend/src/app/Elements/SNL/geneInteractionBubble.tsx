@@ -1,16 +1,26 @@
 import { useSignal } from '@preact/signals-react';
 import { Interaction, InteractionType } from './snlBox';
+import { useState } from 'react';
 
 type Props = {
   interaction: Interaction;
+  geneColors: Record<string,string>;
   onFlip: () => void;
   onToggleType: () => void;
   onRemove: () => void;
+  changeFrom: (i: Interaction, s: string) => void; 
+  changeTo: (i: Interaction, s: string) => void;
 };
 
-export default function GeneInteractionBubble({ interaction, onFlip, onToggleType, onRemove }: Props) {
+export default function GeneInteractionBubble({ interaction, geneColors, onToggleType, onRemove, changeFrom, changeTo}: Props) {
   
-  console.log(interaction)
+  const fromColor = geneColors[interaction.from] ?? "#9ca3af"
+  const toColor = geneColors[interaction.to] ?? "#9ca3af" 
+
+  const [textFrom, setTextFrom] = useState(interaction.from);
+  const [textTo, setTextTo] = useState(interaction.to);
+  
+  // console.log(interaction)
   const { from, label, to } = interaction;
 
 
@@ -20,34 +30,56 @@ export default function GeneInteractionBubble({ interaction, onFlip, onToggleTyp
       : 'bg-red-500 hover:bg-red-600';
 
   return (
-    <div className="relative flex items-center justify-center mx-auto w-full p-5 gap-5 bg-blue-200 rounded-md">
+    <div className="flex w-full max-w-[800px] mx-auto items-center gap-3 p-3 bg-second rounded-md relative">
       <button
-        className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-sm font-bold"
+        className=" py-1 text-4xl font-bold text-main hover:text-red-600"
         onClick={onRemove}
         aria-label="Delete"
       >
         ×
       </button>
 
-      <span className="text-center flex-1 text-2xl">{from}</span>
+
+      <input type="text"
+        className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
+        style={{ border: `5px solid ${fromColor}` }}    
+        value={textFrom}
+        onChange={(e) => {
+          console.log(e.target.value)
+          const value = e.target.value;
+          changeFrom(interaction, value);
+          setTextFrom(value);
+        }}
+      />
+
 
       <div className="flex flex-col items-center gap-2">
         <button
-          className={`border-gray-400 rounded-md px-3 py-1 min-w-25 ${buttonColor}`}
+          className={`border-gray-400 rounded-md px-3 py-1 min-w-20 ${buttonColor}`}
           onClick={onToggleType}
         >
           {label == "activation" ? 'activates' : 'inhibits'}
         </button>
 
-        <button
+        {/* <button
           className="bg-white border border-gray-400 rounded-md px-3 py-1 hover:bg-gray-100 min-w-25"
           onClick={onFlip}
         >
           &#8596;
-        </button>
+        </button> */}
       </div>
 
-      <span className="text-center flex-1 text-2xl">{to}</span>
+      <input type="text"
+        className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
+        style={{ border: `5px solid ${toColor}` }}    
+        value={textTo}
+        onChange={(e) => {
+          console.log(e.target.value)
+          const value = e.target.value;
+          changeTo(interaction, value);
+          setTextTo(value);
+        }}
+      />
     </div>
   );
 }

@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 import TopBar from './Elements/TopBar';
 import NatrualLanguageBox from './Elements/natrualLanguageBox';
 import { SNLBox, Interaction } from './Elements/SNL/snlBox';
-import GeneNetworkGraph from './graph';
+import GeneNetworkGraph from './Elements/graph';
 import LogicalFormulasContainer, {
   LogicalFormula as LF,
 } from './Elements/logicalFormulas/lfContainer';
@@ -87,23 +87,27 @@ export default function Home() {
 
   /* ────────────────────────── JSX ─────────────────────────── */
   return (
-    <div className="min-h-screen bg-midnight text-white">
+    <div className="min-h-screen bg-main ">
       {/* header bar */}
       <TopBar />
 
       {/* input area: natural language + SNL editor */}
-      <div className="flex flex-row bg-blue-950 p-5 h-[400px]">
-        <NatrualLanguageBox header="GID" fun={fetchGraph} />
-        <SNLBox graph={graph ?? emptyGraph} setGeneList={setGraph} />
+      <div className="flex flex-row h-[400px]">
+        <NatrualLanguageBox fun={fetchGraph} />
+        <SNLBox 
+          graph={graph ?? emptyGraph} 
+          setGeneList={setGraph}
+          geneColors={geneColors}
+        />
       </div>
 
       {/* main content: graph (65 %)  |  logical formulas (35 %) */}
-      <div className="flex flex-row gap-4 p-6">
+      <div className="flex flex-row">
         <div className="flex-[2]">
           <GeneNetworkGraph graph={graph} geneColors={geneColors} />
         </div>
 
-        <div className="flex-[1] overflow-y-auto max-h-[600px]">
+        <div className="flex-[1] overflow-y-auto max-h-[600px] p-4">
           <LogicalFormulasContainer
             lf={lf}
             setLF={setLF}
