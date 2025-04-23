@@ -149,11 +149,11 @@ def entities(doc: Doc):
 
 
 
-def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str]) -> list[tuple[str, str, str, str]]:
+def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str]) -> str:
     """Processes interactions by ensuring multiple genes are handled correctly and normalizing verbs."""
     
     activation_verbs = {"activate", "activation", "enhance", "upregulation", "induce", "stimulate", "upregulate", "increase", "observe", "promote", "auto-activating", "necessary", "regulate"}
-    repression_verbs = { "repress", "inhibit", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish"}
+    repression_verbs = { "repress", "inhibit", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish", "lost", "lose"}
     
     parsed_interactions = []  # Store cleaned interactions
     
@@ -199,16 +199,24 @@ def to_parser(interactions: list[tuple[str, str, str, str]], gene_list: list[str
         if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
             inter += f" {interaction[0]} {interaction[1]} {interaction[2]}. "
 
+    for i, interaction in enumerate(parsed_interactions): 
+        if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
+            print('\033[0m', f"Interaction {i+1}:", interaction[0], interaction[1], interaction[2], "    \tOriginal:", interaction[3])
+        elif interaction != None: 
+            print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
+
 
     return inter
 
 
 def nlp_runner(text: str) -> str:
+    text = re.sub(r"\.(?!\s)", "-", text)
     nlp = spacy.load("en_ner_bionlp13cg_md")
     nlp.tokenizer = geneTokenizer(nlp)
     doc = nlp(text)
 
     genes = extract_genes(text)
+    print(genes)
     interactions =  to_parser(matcher(doc, genes), genes)
 
     return interactions
@@ -229,9 +237,9 @@ if __name__ == '__main__':
     
     text4 = "Gene W activates its own expression and that of Gene X. Gene Y represses Gene Z through an intermediate signaling cascade. Gene A1 is activated by Gene B1 only when Gene C1 is also present. Gene D1 represses Gene E1 in response to environmental stress. Gene F1 forms a positive feedback loop with Gene G1. Gene H1 inhibits Gene I1, preventing its expression under normal conditions. Gene J1 activates Gene K1, which in turn represses Gene J1. Gene L1 and Gene M1 both repress Gene N1 independently. Gene O1 is activated by Gene P1 but only after a time delay. Gene Q1 requires both Gene R1 and Gene S1 to be inactive for its expression. Gene T1 indirectly activates Gene U1 by repressing its inhibitor Gene V1. Gene W1 and Gene X1 form a toggle switch where each represses the other. Gene Y1 is regulated by Gene Z1 in a concentration-dependent manner. Gene A2 is activated by Gene B2 during the early stages of development. Gene C2 represses Gene D2 after cell differentiation."
     
-    text5 = "TBX5 activates NPPA expression in early cardiogenesis.   MEF2C directly binds the promoter region of MYH6 to enhance transcription.   Loss of PITX2 leads to upregulation of SHOX2 and HCN4.   GATA4 knockout results in reduced expression of NKX2-5.   ISL1 positively regulates TBX20 expression during cardiac development.   Overexpression of HAND1 suppresses IRX3 expression.   HEY2 directly represses MYL7 in ventricular tissue.   Expression of BMP10 is diminished in MEF2C knockout hearts.   TBX2 represses chamber-specific genes including NPPA and GJA5.   NOTCH1 activation leads to increased expression of HEY1 and HEY2.   Reduced NKX2-5 expression correlates with increased SHOX2 activity.   FOXC1 and FOXC2 cooperatively regulate PROX1 expression in lymphatic endothelium.   Deletion of TCF21 leads to ectopic activation of smooth muscle genes.   GATA6 is necessary for proper expression of ALDH1A2 in the developing heart.   IRX5 represses expression of KCND2 in ventricular myocardium. "
+    text5 = "In CMs derived by human induced pluripotent stem cells, GATA6 and GATA4 directly activate HAND2 expression. In mice cells, GATA proteins (together with TBX20 ) enhance HEY2 expression in ventricular CMs. In mice cells, IRX4 expression is lost by HAND2 (with/or NKX2.5 ) knockout ventricular CMs. IRX contributes to activating ventricular genes and supressing atrial genes. IRX4 activates both HAND1 and HAND2. IRX4 activates also HAND1. In atrial cells derived by human induced embryonic stem cells, COUP-TFII, a transcription factor encoded by the NR2F2 gene, is robustly upregulated in response to RA during directed atrial differentiation. In mice cardiac cells, COUP-TFII represses IRX4 gene expression in CMs via direct binding to COUP-TFII response elements at the IRX4 genomic loci [39]. In mice cardiac cells, COUP-TFII represses MYL2 gene expression through binding to multiple chromatin sites. In mice cardiac cells, COUP-TFII represses HEY2 gene expression in CMs via direct binding to COUP-TFII response elements at the HEY2 genomic loci. In mice cardiac cells, COUP-TFII binds to genomic loci of MYL7 and expression is lost in COUP-TFII knockout cells. In mice cells, ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. In mice cells, expression of HEY2 is increased by NOTCH signalling."
 
-    text = "text1"
+    text = text5
     doc = nlp(text)
 
     genes = extract_genes(text)
@@ -243,9 +251,3 @@ if __name__ == '__main__':
 
 
     print(genes)
-    # print(interactions)
-    for i, interaction in enumerate(interactions): 
-        if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
-            print('\033[0m', f"Interaction {i+1}:", interaction[0], interaction[1], interaction[2], "    \tOriginal:", interaction[3])
-        elif interaction != None: 
-            print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
