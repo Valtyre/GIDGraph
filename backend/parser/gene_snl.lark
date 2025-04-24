@@ -1,19 +1,19 @@
 start: statement+
 
 statement: activation "."
-         | inhibition "."
-         | knockout "."
-         | binding "."
+        | inhibition "."
+        | knockout "."
+        | binding "."
 
-activation: gene "activates" gene  -> activation
-inhibition: gene "inhibits" gene  -> inhibition
-knockout: gene "knockout" "inhibits" gene  -> knockout
+activation: gene "activates" gene   -> activation
+inhibition: gene "inhibits" gene    -> inhibition
+knockout:   gene "knockout" "inhibits" gene  -> knockout
         | gene "knockout" "leads to" gene  -> knockout
-binding: gene "binds" gene -> binding
+binding:    gene "binds" gene       -> binding
 
-gene: CNAME
-process: CNAME
-
-%import common.CNAME
+// terminals
+GENE: /[A-Za-z][A-Za-z0-9-]*/
 %import common.WS
 %ignore WS
+
+gene: GENE
