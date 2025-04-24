@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Import the function in parser_manager.py
 from backend.parser_manager import process_nl_text, process_snl_only
+from backend.exporter import router as exporter_router
 
 app = FastAPI()
 
@@ -45,12 +46,11 @@ def parse_text(input_data: TextInput):
 
 @app.post("/api/update_snl")
 def update_snl(input_data: TextInput):
-    """
-    Edited SNL -> new graph
-    """
-    new_graph = process_snl_only(input_data.text)
-    return {"graph": new_graph}
+    return {"graph": process_snl_only(input_data.text)}
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+# Include the exporter router to handle the export_ginml endpoint
+app.include_router(exporter_router)

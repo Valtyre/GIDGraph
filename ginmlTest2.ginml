@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gxl SYSTEM "http://ginsim.org/GINML_2_2.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph class="regulatory" id="export_20250424_172127" nodeorder="NOTCH NR2F2 IRX4 HEY2 GATA46 MYL2 HAND2 MYL7">
+    <nodestyle background="#ffffff" foreground="#000000" text="#000000" shape="RECTANGLE" width="45" height="25"/>
+    <edgestyle color="#000000" pattern="SIMPLE" line_width="1" properties="positive:#00c800 negative:#c80000 dual:#0000c8"/>
+    <node id="NOTCH" maxvalue="1">
+      <parameter idActiveInteractions=" NOTCH:NOTCH" val="1"/>
+    </node>
+    <node id="NR2F2" maxvalue="1"/>
+    <node id="IRX4" maxvalue="1">
+      <parameter idActiveInteractions=" !NR2F2:IRX4" val="1"/>
+    </node>
+    <node id="HEY2" maxvalue="1">
+      <parameter idActiveInteractions=" GATA46:HEY2" val="1"/>
+      <parameter idActiveInteractions=" !NR2F2:HEY2" val="1"/>
+      <parameter idActiveInteractions=" NOTCH:HEY2" val="1"/>
+    </node>
+    <node id="GATA46" maxvalue="1"/>
+    <node id="MYL2" maxvalue="1">
+      <parameter idActiveInteractions=" IRX4:MYL2" val="1"/>
+      <parameter idActiveInteractions=" !NR2F2:MYL2" val="1"/>
+    </node>
+    <node id="HAND2" maxvalue="1">
+      <parameter idActiveInteractions=" GATA46:HAND2" val="1"/>
+      <parameter idActiveInteractions=" IRX4:HAND2" val="1"/>
+    </node>
+    <node id="MYL7" maxvalue="1">
+      <parameter idActiveInteractions=" !HEY2:MYL7" val="1"/>
+    </node>
+    <edge id="GATA46:HEY2" from="GATA46" to="HEY2" minvalue="1" sign="positive"/>
+    <edge id="GATA46:HAND2" from="GATA46" to="HAND2" minvalue="1" sign="positive"/>
+    <edge id="HEY2:MYL7" from="HEY2" to="MYL7" minvalue="1" sign="negative"/>
+    <edge id="IRX4:MYL2" from="IRX4" to="MYL2" minvalue="1" sign="positive"/>
+    <edge id="IRX4:HAND2" from="IRX4" to="HAND2" minvalue="1" sign="positive"/>
+    <edge id="NR2F2:IRX4" from="NR2F2" to="IRX4" minvalue="1" sign="negative"/>
+    <edge id="NR2F2:MYL2" from="NR2F2" to="MYL2" minvalue="1" sign="negative"/>
+    <edge id="NR2F2:HEY2" from="NR2F2" to="HEY2" minvalue="1" sign="negative"/>
+    <edge id="NOTCH:HEY2" from="NOTCH" to="HEY2" minvalue="1" sign="positive"/>
+    <edge id="NOTCH:NOTCH" from="NOTCH" to="NOTCH" minvalue="1" sign="positive"/>
+  </graph>
+</gxl>

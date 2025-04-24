@@ -43,6 +43,29 @@ export default function Home() {
   /* gene → colour map shared by graph nodes & LF bubbles */
   const [geneColors, setGeneColors] = useState<Record<string, string>>({});
 
+  /* ───── Export handler  ───── */
+  function exportGinml() {
+    if (!graph) return;                   // nothing to export yet
+
+    fetch("http://localhost:8000/api/export_ginml", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ graph, lf }),   // send current state
+    })
+      .then(res => res.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a   = document.createElement("a");
+        a.href = url;
+        a.download = "model.ginml";
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch(console.error);
+  }
+
+
+
   /* ───────────── API call & unique‑id injection ───────────── */
   function fetchGraph(nlText: string) {
     fetch('http://localhost:8000/api/parse', {
@@ -89,7 +112,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-main ">
       {/* header bar */}
-      <TopBar />
+      <TopBar onExport={graph ? exportGinml : undefined} />
 
       {/* input area: natural language + SNL editor */}
       <div className="flex flex-row h-[400px]">
