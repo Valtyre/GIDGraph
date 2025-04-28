@@ -1,6 +1,6 @@
-import { Graph } from "./page";
-import { LogicalFormula as LF } from "./Elements/logicalFormulas/lfContainer";
-import { Interaction } from "./Elements/SNL/snlBox";
+import { Graph } from "../../page";
+import { LogicalFormula as LF } from "./lfContainer";
+import { Interaction } from "../SNL/snlBox";
 
 /**
  * Convert Graph -> array of logical‑formula objects.

@@ -20,7 +20,7 @@ import LogicalFormulasContainer, {
 } from './Elements/logicalFormulas/lfContainer';
 
 /* ── helpers ──────────────────────────────────────────────────────────── */
-import { buildLogicalFormulas } from './lfBuilder';
+import { buildLogicalFormulas } from './Elements/logicalFormulas/lfBuilder';
 
 /* ── Type definitions ─────────────────────────────────────────────────── */
 export type Graph = {
@@ -44,24 +44,8 @@ export default function Home() {
   const [geneColors, setGeneColors] = useState<Record<string, string>>({});
 
   /* ───────────── API call & unique‑id injection ───────────── */
-  function fetchGraph(nlText: string) {
-    fetch('http://localhost:8000/api/parse', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: nlText }),
-    })
-      .then(res => res.json())
-      .then((data: { graph: Graph }) => {
-        /* ensure every edge has a stable numeric id */
-        let nextId = 0;
-        const withIds = data.graph.edges.map(edge =>
-          edge.id === undefined ? { ...edge, id: nextId++ } : edge
-        );
-
-        setGraph({ node: data.graph.node, edges: withIds });
-      })
-      .catch(err => console.error('parse API error:', err));
-  }
+  
+  
 
   /* ─── rebuild formulas & colours whenever `graph` changes ── */
   useEffect(() => {
@@ -93,7 +77,7 @@ export default function Home() {
 
       {/* input area: natural language + SNL editor */}
       <div className="flex flex-row h-[400px]">
-        <NatrualLanguageBox fun={fetchGraph} />
+        <NatrualLanguageBox fun={setGraph} />
         <SNLBox 
           graph={graph ?? emptyGraph} 
           setGeneList={setGraph}

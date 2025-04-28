@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { DataSet, Network, Node, Edge } from 'vis-network/standalone';
 import { Interaction, InteractionType } from './SNL/snlBox'; // Adjust the path if needed
+import { Infobox } from './infobox';
 
 interface VisNode extends Node {
   id: string;
@@ -115,8 +116,13 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
     new Network(networkRef.current, data, options);
   }, [graph, geneColors]);
 
+  const info = `
+  Here is the visual representation of the gene interactions presented in the Semi-Natural Language field. 
+  The graph is interactive. 
+  `
   return (
     <div className="p-5 h-full w-full flex-1">
+      <h1 className="font-bold text-3xl text-second"> Graph <Infobox text={info}/> </h1>
       <div
         id="network"
         ref={networkRef}
