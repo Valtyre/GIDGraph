@@ -1,69 +1,90 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Infobox } from "./infobox";
 import { Graph } from "../page";
 
-export default function NatrualLanguageBox({ fun } : { fun: Dispatch<SetStateAction<Graph | null>>}) {
+export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetStateAction<Graph | null>>, graph: Graph | null }) {
   const [text, setText] = useState("");
-
   const [cursor, setCursor] = useState<"default" | "wait">("default");
+  const [graphModified, setGraphModified] = useState(false);
 
+  const initialGraph = useRef<Graph | null>(null);
+
+  // Save the first loaded graph
+  useEffect(() => {
+    if (graph && initialGraph.current === null) {
+      initialGraph.current = graph;
+    }
+  }, [graph]);
+
+  // Check if graph has changed
+  useEffect(() => {
+    if (graph && initialGraph.current) {
+      const same = JSON.stringify(graph) === JSON.stringify(initialGraph.current);
+      setGraphModified(!same);
+    }
+  }, [graph]);
 
   async function fetchGraph(nlText: string) {
-    // Set cursor to "wait"
-    setCursor("wait")
+    setCursor("wait");
     document.body.style.cursor = "wait";
 
-  
     try {
       const res = await fetch('http://localhost:8000/api/parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: nlText }),
       });
-  
+
       const data: { graph: Graph } = await res.json();
-  
+
       /* ensure every edge has a stable numeric id */
       let nextId = 0;
       const withIds = data.graph.edges.map(edge =>
         edge.id === undefined ? { ...edge, id: nextId++ } : edge
       );
-  
+
       fun({ node: data.graph.node, edges: withIds });
-  
+
     } catch (err) {
       console.error('parse API error:', err);
-  
-    } finally {
-      setCursor("default")
-      document.body.style.cursor = "default";
 
+    } finally {
+      setCursor("default");
+      document.body.style.cursor = "default";
     }
   }
 
   const info = `
   Input natural language discriptions of gene interactions into this field. 
-  From here, the interactions can be extracted, and diplayed in the Semi-Natural Language box.
+  From here, the interactions can be extracted, and displayed in the Semi-Natural Language box.
   `
 
   return (
     <>
-      <div className="flex flex-col mx-auto w-full p-5"> 
-        <h1 className=" font-bold text-3xl text-second">
+      <div className="flex flex-col mx-auto w-full p-5">
+        <h1 className="font-bold text-3xl text-second">
           Gene Interaction Description <Infobox text={info}/>
         </h1>
+
+        {graphModified && (
+          <h2 className="text-lg font-bold text-red-600">
+            ⚠️ Warning: The natural language does not match the graph output 
+          </h2>
+        )}
+
         <textarea
-          className= {`bg-off border-third border-2 rounded-sm w-full p-3 h-full resize-none hover:cursor-${cursor}`}
-          value={text} 
+          className={`bg-off border-third border-2 rounded-sm w-full p-3 h-full resize-none ${cursor === "wait" ? "cursor-wait" : "cursor-default"}`}
+          value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Enter text here"
         />
-        <button 
+        <button
           onClick={() => {
-            fetchGraph(text); 
-            console.log("click")
-          }} 
-          className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main hover:cursor-${cursor} hover:bg-second `}>
+            fetchGraph(text);
+            console.log("click");
+          }}
+          className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main ${cursor === "wait" ? "cursor-wait" : "cursor-default"} hover:bg-second`}
+        >
           Convert to Semi-Natural Language
         </button>
       </div>

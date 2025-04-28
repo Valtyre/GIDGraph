@@ -77,7 +77,7 @@ export default function Home() {
 
       {/* input area: natural language + SNL editor */}
       <div className="flex flex-row h-[400px]">
-        <NatrualLanguageBox fun={setGraph} />
+        <NatrualLanguageBox fun={setGraph} graph={graph} />
         <SNLBox 
           graph={graph ?? emptyGraph} 
           setGeneList={setGraph}
