@@ -1,3 +1,4 @@
+import { Infobox } from "../infobox";
 import LogicalFormulasBubble from "./lfBubble";
 
 /* ----- types (unchanged) ----- */
@@ -38,15 +39,25 @@ export default function LogicalFormulasContainer({
     );
   };
 
+  const info = `
+  In this field, the logical formulas derived from the gene interactions is shown. Click the 'and' and 'or' buttons to switch between.
+  The user can export these logical formulas to GINML, for use in GinSim.
+  `
+
   if (!lf.length)
     return (
+  <>
+      <h1 className="font-bold text-3xl text-second">Semi-Natural Language <Infobox text={info}/> </h1>
       <div className="text-center text-gray-400 mt-4">
+        
         No logical formulas yet
       </div>
+  </>
     );
 
   return (
     <div className="flex flex-col gap-2 p-4">
+      <h1 className="font-bold text-3xl text-second">Semi-Natural Language <Infobox text={info}/> </h1>
       {lf.map((formula, idx) => (
         <LogicalFormulasBubble
           key={idx}

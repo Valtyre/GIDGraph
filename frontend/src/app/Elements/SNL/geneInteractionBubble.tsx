@@ -1,5 +1,5 @@
 import { useSignal } from '@preact/signals-react';
-import { Interaction, InteractionType } from './snlBox';
+import { Interaction } from './snlBox';
 import { useState } from 'react';
 
 type Props = {
@@ -20,7 +20,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
   const [textFrom, setTextFrom] = useState(interaction.from);
   const [textTo, setTextTo] = useState(interaction.to);
   
-  // console.log(interaction)
   const { from, label, to } = interaction;
 
 
@@ -45,7 +44,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         style={{ border: `5px solid ${fromColor}` }}    
         value={textFrom}
         onChange={(e) => {
-          console.log(e.target.value)
           const value = e.target.value;
           changeFrom(interaction, value);
           setTextFrom(value);
@@ -55,7 +53,7 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
 
       <div className="flex flex-col items-center gap-2">
         <button
-          className={`border-gray-400 rounded-md px-3 py-1 min-w-20 ${buttonColor}`}
+          className={`border-gray-400 rounded-md px-3 py-1 min-w-22 ${buttonColor}`}
           onClick={onToggleType}
         >
           {label == "activation" ? 'activates' : 'inhibits'}
@@ -74,7 +72,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         style={{ border: `5px solid ${toColor}` }}    
         value={textTo}
         onChange={(e) => {
-          console.log(e.target.value)
           const value = e.target.value;
           changeTo(interaction, value);
           setTextTo(value);
