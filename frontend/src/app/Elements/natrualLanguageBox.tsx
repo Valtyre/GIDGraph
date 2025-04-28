@@ -7,6 +7,8 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
   const [cursor, setCursor] = useState<"default" | "wait">("default");
   const [graphModified, setGraphModified] = useState(false);
 
+  const exampleText1 = "GATA46 enhances HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout.IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling. NOTCH activates NOTCH."
+  const exampleText2 = "Gene A activates Gene B. Gene C inhibits the expression of Gene D. Gene E and Gene F cooperatively activate Gene G. Gene H represses Gene I, but only in the presence of Gene J. Gene K is auto-activating. Gene L represses both Gene M and Gene N. Gene O is activated by Gene P but repressed by Gene Q. Gene R is only activated when Gene S is inactive. Gene T and Gene U form a mutual inhibition loop. Gene V is constitutively expressed and not regulated by other genes."
   const initialGraph = useRef<Graph | null>(null);
 
   // Save the first loaded graph
@@ -78,15 +80,35 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
           onChange={(e) => setText(e.target.value)}
           placeholder="Enter text here"
         />
-        <button
-          onClick={() => {
-            fetchGraph(text);
-            console.log("click");
-          }}
-          className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main ${cursor === "wait" ? "cursor-wait" : "cursor-default"} hover:bg-second`}
-        >
-          Convert to Semi-Natural Language
-        </button>
+        <div className="flex flex-row gap-2 justify-between w-full">
+            <button
+              onClick={() => {
+                fetchGraph(text);
+                console.log("click");
+              }}
+              className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main ${cursor === "wait" ? "cursor-wait" : "cursor-default"} hover:bg-second`}
+              >
+              Convert to Semi-Natural Language
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setText(exampleText1)
+                }}
+                className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main ${cursor === "wait" ? "cursor-wait" : "cursor-default"} hover:bg-second`}
+                >
+                Example 1
+              </button>
+              <button
+                onClick={() => {
+                  setText(exampleText2)
+                }}
+                className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main ${cursor === "wait" ? "cursor-wait" : "cursor-default"} hover:bg-second`}
+                >
+                Example 2
+              </button>
+                </div>
+          </div>
       </div>
     </>
   );
