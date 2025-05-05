@@ -63,7 +63,7 @@ class GeneTransformer(Transformer):
         """
         Exports the graph to a JSON file in a vis.js compatible format.
         """
-        graph_data = self.get_vis_data()  # <-- We'll reuse the new helper method
+        graph_data = self.get_vis_data()  # <-- reuse the new helper method
         with open(filename, "w") as f:
             json.dump(graph_data, f, indent=4)
         print(f"Graph JSON saved as {filename}")
