@@ -2,14 +2,17 @@
   "name": "test_app",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
+"homepage": "https://<your-github-username>.github.io/GIDGraph",
+"scripts": {
+  "dev": "next dev --turbopack",
+  "build": "next build",
+  "predeploy": "npm run build",
+  "postbuild": "touch out/.nojekyll && echo 'www.gidgraph.com' > out/CNAME",
+  "deploy": "gh-pages -d out"
+},
   "dependencies": {
     "@preact/signals-react": "^3.0.1",
+    "gh-pages": "^6.3.0",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
