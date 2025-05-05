@@ -14,11 +14,11 @@ app = FastAPI()
 origins = [
     # "http://localhost:3000",
     # "http://127.0.0.1:3000",
-    "http://82.211.198.142:8000",
-    "https://valtyre.github.io/GIDGraph/"
+    #"http://82.211.198.142:8000",
+    #"https://valtyre.github.io/GIDGraph/"
     "https://www.gidgraph.com",     # GH‑Pages site
     "https://api.gidgraph.com",     # API
-
+    "https://gidgraph.com",
 ]
 
 app.add_middleware(
