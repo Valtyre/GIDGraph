@@ -31,7 +31,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
     document.body.style.cursor = "wait";
 
     try {
-      const res = await fetch('http://localhost:8000/api/parse', {
+      const res = await fetch('"https://api.gidgraph.com/api/parse"', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: nlText }),
