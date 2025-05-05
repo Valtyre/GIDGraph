@@ -47,7 +47,7 @@ export default function Home() {
   function exportGinml() {
     if (!graph) return;                   // nothing to export yet
 
-    fetch("http://localhost:8000/api/export_ginml", {
+    fetch("https://api.gidgraph.com/api/export_ginml", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ graph, lf }),   // send current state

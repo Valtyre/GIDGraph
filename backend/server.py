@@ -12,8 +12,13 @@ app = FastAPI()
 # List the domains (origins) that are allowed to talk to this API.
 # For local development with React/Next on port 3000, add that:
 origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    # "http://localhost:3000",
+    # "http://127.0.0.1:3000",
+    "http://82.211.198.142:8000",
+    "https://valtyre.github.io/GIDGraph/"
+    "https://www.gidgraph.com",     # GH‑Pages site
+    "https://api.gidgraph.com",     # API
+
 ]
 
 app.add_middleware(
