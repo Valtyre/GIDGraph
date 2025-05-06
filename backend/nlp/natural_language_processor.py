@@ -8,6 +8,8 @@ from spacy.tokens.token import Token
 from biobert_genetic_ner import extract_genes
 import re
 
+printer = True
+
 def geneTokenizer(nlp):
     infix_re = re.compile(r'''[.\,\?\!\:\;\…]''')  # Keep default infix rules but remove hyphens splitting
     prefix_re = re.compile(r'''^[\(\[\{\<\']''')  # Keep default prefix rules
@@ -28,14 +30,12 @@ def get_compound_phrase(head_token: Token):
     return " ".join([t.text for t in modifiers] + [head_token.text])
 
 
-
-
 def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
 
     for e in doc.ents:
         if e.label_ == "GENE_OR_GENE_PRODUCT": 
-            gene_list = list(set(gene_list).add(e.text))
-
+            gene_list.append(e.text)
+    gene_list = list(set(gene_list))
         
     relationships: list[tuple[str, str, str, str, list[float], list[float]]] = []
 
@@ -49,7 +49,7 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
             continue
 
 
-        print("\nSentence:" , sent, "\n")
+        if (printer): print("\nSentence:" , sent, "\n")
 
         root = [sent.root]
         actor = None 
@@ -58,14 +58,14 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
         for token in sent:
 
 
-            print(token, '\033[31m', token.dep_, '\033[32m', token.head, '\033[93m', token.pos_, '\033[95m', token.lemma_, "CHILDREN:", [child.text for child in token.children],'\033[0m' )
+            if (printer): print(token, '\033[31m', token.dep_, '\033[32m', token.head, '\033[93m', token.pos_, '\033[95m', token.lemma_, "CHILDREN:", [child.text for child in token.children],'\033[0m' )
 
             # Gene list 
             if token.text.upper() in gene_list: 
                 # Compound 
                 if token.dep_ == "compound":
                     phrase = get_compound_phrase(token.head)
-                    print("Compound phrase:", '\033[36m', phrase, '\033[0m')
+                    if (printer): print("Compound phrase:", '\033[36m', phrase, '\033[0m')
                     if (actor == None or token.text == actor) and (token.head.dep_ in ["nsubj", "nmod"]):
                         actor = phrase
                     elif (target == None or token.text == target) and (token.head.dep_ in ["dobj", "nsubjpass", "nmod"]):
@@ -134,7 +134,7 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
         #                 target = token.text
         #                 continue
         
-        print("\nACTOR: ", actor, "ROOT: ", root, "TARGET: ", target, [r.similarity(activate) for r in root],[r.similarity(inhibit) for r in root])
+        if (printer): print("\nACTOR: ", actor, "ROOT: ", root, "TARGET: ", target, [r.similarity(activate) for r in root],[r.similarity(inhibit) for r in root])
 
 
         if None in [actor, root, target]: continue
@@ -156,12 +156,14 @@ def entities(doc: Doc):
 
 
 def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, list[float], list[float]]], gene_list: list[str]) -> str:
+    
     """Processes interactions by ensuring multiple genes are handled correctly and normalizing verbs."""
     
     activation_verbs = { "activate", "activation", "trigger", "enhance", "boost", "raise", "amplify", "upregulation", "improve", "induce", "stimulate", "upregulate", "increase", "promote", "auto-activating"}
     repression_verbs = { "repress", "inhibit", 'hinder', "impede", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish", "lost", "lose", "decrease"}
     
     parsed_interactions = []  # Store cleaned interactions
+    seen_interactions = set()  # Track unique interactions
     
 
     for i in range(len(interactions)):
@@ -199,9 +201,9 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
                     r = "activates"
                 elif token in repression_verbs:
                     r = "inhibits"
-                elif max(a_sim) >  max(i_sim): 
+            if max(a_sim) >  max(i_sim): 
                     r = "activates"
-                elif max(a_sim) <  max(i_sim):
+            elif max(a_sim) <  max(i_sim):
                     r = "inhibits"
 
         if knockout and r == "activates": 
@@ -213,18 +215,22 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
         # Create separate interactions for each subject-target pair
         for a_gene in a_genes:
             for t_gene in t_genes:
-                parsed_interactions.append((a_gene, r, t_gene, sent))
+                interaction_tuple = (a_gene, r, t_gene)
+                if interaction_tuple not in seen_interactions:
+                    parsed_interactions.append((a_gene, r, t_gene, sent))
+                    seen_interactions.add(interaction_tuple)
         
     inter = ''
     for i, interaction in enumerate(parsed_interactions): 
         if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
             inter += f" {interaction[0]} {interaction[1]} {interaction[2]}. "
 
-    for i, interaction in enumerate(parsed_interactions): 
-        if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
-            print('\033[0m', f"Interaction {i+1}:", interaction[0], interaction[1], interaction[2], "    \tOriginal:", interaction[3])
-        elif interaction != None: 
-            print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
+    if (printer):
+        for i, interaction in enumerate(parsed_interactions): 
+            if interaction[0] != None and interaction[1] in ["activates", "inhibits"] and interaction[2] != None:
+                print('\033[0m', f"Interaction {i+1}:", interaction[0], interaction[1], interaction[2], "    \tOriginal:", interaction[3])
+            elif interaction != None: 
+                print('\033[31m', f"Interaction {i+1}:", interaction[3],'\033[36m', interaction[0], interaction[1], interaction[2])
 
 
     return inter
@@ -263,7 +269,7 @@ if __name__ == '__main__':
 
 
     addon = "GENE1 upregulates GENE2. GENE1 represses GENE2. "
-    text = addon + test1
+    text = addon + text2
     text = re.sub(r"\.(?!\s)", "-", text + " ")
     doc = nlp(text)
 
@@ -276,4 +282,4 @@ if __name__ == '__main__':
 
 
 
-    print(genes)
+    # print(genes)
