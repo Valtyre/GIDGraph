@@ -57,7 +57,7 @@ export default function LogicalFormulasContainer({
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      <h1 className="font-bold text-3xl text-second">Logical Formulas<Infobox text={info}/> </h1>
+      <h1 className="font-bold text-3xl text-third">Logical Formulas<Infobox text={info}/> </h1>
       {lf.map((formula, idx) => (
         <LogicalFormulasBubble
           key={idx}

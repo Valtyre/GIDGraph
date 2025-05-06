@@ -64,7 +64,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
   return (
     <>
       <div className="flex flex-col mx-auto w-full p-5">
-        <h1 className="font-bold text-3xl text-second">
+        <h1 className="font-bold text-3xl text-third">
           Gene Interaction Description <Infobox text={info}/>
         </h1>
 

@@ -111,7 +111,7 @@ export function SNLBox({graph, setGeneList, geneColors}: {graph: Graph, setGeneL
   `
   return (
     <div className="flex flex-col mx-auto w-full p-5">
-      <h1 className="font-bold text-3xl text-second">Semi-Natural Language <Infobox text={info}/> </h1>
+      <h1 className="font-bold text-3xl text-third">Semi-Natural Language <Infobox text={info}/> </h1>
       <div className="flex flex-col p-3 gap-2 overflow-scroll bg-off border-2 border-third rounded-sm">
       {geneList ? geneList.map((inter) => (
         <GeneInteractionBubble key={inter.id}

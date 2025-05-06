@@ -109,6 +109,14 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
         },
       },
       edges: {
+        width: 2,                     // ← increase line thickness
+        arrows: {
+          to: {
+            enabled: true,
+            type: 'arrow',
+            scaleFactor: 2,           // ← enlarge arrow head
+          },
+        },
         font: { size: 0 },
       },
     };
@@ -122,7 +130,7 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
   `
   return (
     <div className="p-5 h-full w-full flex-1">
-      <h1 className="font-bold text-3xl text-second"> Graph <Infobox text={info}/> </h1>
+      <h1 className="font-bold text-3xl text-third"> Graph <Infobox text={info}/> </h1>
       <div
         id="network"
         ref={networkRef}
