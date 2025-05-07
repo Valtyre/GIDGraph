@@ -47,7 +47,7 @@ export default function LogicalFormulasContainer({
   if (!lf.length)
     return (
   <>
-      <h1 className="font-bold text-3xl text-second">Logical Formulas<Infobox text={info}/> </h1>
+      <h1 className="font-bold text-3xl text-third">Logical Formulas<Infobox text={info}/> </h1>
       <div className="text-center text-gray-400 mt-4">
         
         No logical formulas yet

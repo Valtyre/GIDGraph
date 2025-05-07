@@ -1,30 +1,47 @@
-
-
 from natural_language_processor import nlp_runner
 
 
 def NLP_tester():
 
-    easy_test1 = "GATA46 enhances HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout.IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling."
+    # Georgious 
+    text_41 = "GATA46 enhances HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout. IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling."
+    expected_41 = "GATA46 activates HEY2. GATA46 activates HAND2. HAND2 activates IRX4. IRX4 activates MYL2. IRX4 activates HAND2. NR2F2 inhibits IRX4. NR2F2 inhibits MYL2. NR2F2 inhibits HEY2. NR2F2 activates MYL7. HEY2 inhibits MYL7. HEY2 activates NOTCH."
 
-    easy_test2 = "In CMs derived by human induced pluripotent stem cells, GATA6 and GATA4 directly activate HAND2 expression. In mice cells, GATA proteins (together with TBX20 ) enhance HEY2 expression in ventricular CMs. In mice cells, IRX4 expression is lost by HAND2 (with/or NKX2.5 ) knockout ventricular CMs. IRX contributes to activating ventricular genes and supressing atrial genes. IRX4 activates both HAND1 and HAND2. IRX4 activates also HAND1. In atrial cells derived by human induced embryonic stem cells, COUP-TFII, a transcription factor encoded by the NR2F2 gene, is robustly upregulated in response to RA during directed atrial differentiation. In mice cardiac cells, COUP-TFII represses IRX4 gene expression in CMs via direct binding to COUP-TFII response elements at the IRX4 genomic loci. In mice cardiac cells, COUP-TFII represses MYL2 gene expression through binding to multiple chromatin sites. In mice cardiac cells, COUP-TFII represses HEY2 gene expression in CMs via direct binding to COUP-TFII response elements at the HEY2 genomic loci. In mice cardiac cells, COUP-TFII binds to genomic loci of MYL7 and expression is lost in COUP-TFII knockout cells. In mice cells, ectopic MYL7 (and other atrial genes') expression is observed in HEY2 knockout ventricles. In mice cells, expression of HEY2 is increased by NOTCH signalling."
+    # Molecular mechanisms of heart field specific cardiomyocyte differentiation- a computational modeling approach
+    text_50 = "In CMs derived by human induced pluripotent stem cells, GATA6 and GATA4 directly activate HAND2 expression. In mice cells, GATA proteins (together with TBX20 ) enhance HEY2 expression in ventricular CMs. In mice cells, IRX4 expression is lost by HAND2 (with/or NKX2.5 ) knockout ventricular CMs. IRX contributes to activating ventricular genes and supressing atrial genes. IRX4 activates both HAND1 and HAND2. IRX4 activates also HAND1. In atrial cells derived by human induced embryonic stem cells, COUP-TFII, a transcription factor encoded by the NR2F2 gene, is robustly upregulated in response to RA during directed atrial differentiation. In mice cardiac cells, COUP-TFII represses IRX4 gene expression in CMs via direct binding to COUP-TFII response elements at the IRX4 genomic loci. In mice cardiac cells, COUP-TFII represses MYL2 gene expression through binding to multiple chromatin sites. In mice cardiac cells, COUP-TFII represses HEY2 gene expression in CMs via direct binding to COUP-TFII response elements at the HEY2 genomic loci. In mice cardiac cells, COUP-TFII binds to genomic loci of MYL7 and expression is lost in COUP-TFII knockout cells. In mice cells, ectopic MYL7 (and other atrial genes') expression is observed in HEY2 knockout ventricles. In mice cells, expression of HEY2 is increased by NOTCH signalling."
+    expected_50 = "GATA6 activates HAND2. GATA4 activates HAND2. GATA activates HEY2. HAND2 activates IRX4. IRX4 activates HAND1. IRX4 activates HAND2.  IRX4 activates HAND1. RA activates COUP-TFII. COUP-TFII inhibits IRX4. COUP-TFII inhibits MYL2. COUP-TFII inhibits HEY2. COUP-TFII activates MYL7. HEY2 inhibits MYL7. HEY2 activates NOTCH"
+
+    # Single-cell and coupled GRN models of cell patterning in the Arabidopsis thaliana root stem cell niche
+    text_44 = "ChIP-QRTPCR experiments show that SHR directly binds in vivo to the regulatory sequences of SCR and positively regulates its transcription. In the scr mutant background, promoter activity of SCR is absent in the QC and CEI. A ChIP-PCR assay confirmed that SCR directly binds to its own promoter and directs its own expression. SCR mRNA expression as probed with a reporter lines is lost in the QC and CEI cells in jkd mutants from the early heart stage onward. The double mutant jkd mgp rescues the expression of SCR in the QC and CEI, which is lost in the jkd single mutant. The expression of MGP is severely reduced in the shr background. Experimental data using various approaches have suggested that MGP is a direct target of SHR. This result was later confirmed by ChIP-PCR. SCR directly binds to the MGP promoter, and MGP expression is reduced in the scr mutant background. The post-embryonic expression of JKD is reduced in shr mutant roots. The post-embryonic expression of JKD is reduced in scr mutant roots. WOX5 is not expressed in scr mutants. WOX5 expression is reduced in shr mutants. WOX5 expression is rarely detected in mp or bdl mutants. PLT1 mRNA region of expression is reduced in multiple mutants of PIN genes, and it is overexpressed under ectopic auxin addition. PLT1 &2 mRNAs are absent in the majority of mp embryos and even more so in mp nph4 double mutant embryos. Overexpression of Aux/IAA genes represses the expression of DR5 both in the presence and absence of auxin. Domains III & IV of Aux/IAA genes interact with domains III & IV of ARF stabilizing the dimerization that represses ARF transcriptional activity. Auxin application destabilizes Aux/IAA proteins. Aux/IAA proteins are targets of ubiquitin-mediated auxin-dependent degradation. Wild type root treated with CLE40p show a reduction of WOX5 expression, whereas in cle40 loss of function plants WOX5 is overexpressed."
+    expected_44 = "SHR activates SCR. SCR activates SCR. JKD activates SCR. MGP inhibits SCR. SHR activates MGP. SCR activates MGP. SHR activates JKD. SCR activates JKD. SCR activates WOX5. SHR activates WOX5. ARF (MP) activates WOX5. ARF activates PLT. Aux/IAA inhibits ARF. Auxin inhibits Aux/IAA. CLE40 inhibits WOX5"
+
+    # Area Patterning of the Mammalian Cortex
+    text_60 = "In the anterior signaling center, Fgf8 establishes the low anterior-graded expression of the TFs Emx2 and COUP-TFI by repression, and promotes the high anterior gradient of Sp8 expression.Fgf8 expression is also regulated positively by direct transcriptional activation by Sp8 through its binding to Fgf8 regulatory elements, and indirectly by Emx2, which represses the ability of Sp8 to directly induce Fgf8, as described in Figure 2. The asterisk marking the activation of Fgf8 by Sp8 indicates the only interaction that has been shown to be due to direct binding and transcriptional activation. Putative posterior signaling molecules Bmps and Wnts, expressed in the cortical hem, positively regulate the high caudal gradient of Emx2 expression. Genetic interactions between TFs also participate in the establishment of their graded expression. For example, Emx2 and Pax6 mutually suppress each other’s expression, Coup-TFI suppresses Pax6 expression and enhances Emx2 expression, and Sp8 suppresses Emx2 expression. Those changes to the expression patterns were identified in the knockout mice; thus, these interactions do not necessarily imply direct control of one TF on another. For instance, Emx2 suppression by Sp8 might be due to an enhancement of Fgf8 expression, which in turn acts negatively on Emx2 expression."
+    expected_60 = "Fgf8 activates Fgf8. Emx2 activates Fgf8. Sp8 activates Fgf8. Fgf8 inhibits Emx2. Pax6 inhibits Emx2. Coup-tfi activates Emx2.  Sp8 activates Emx2. Emx2 activates Pax6. Coup-tfi inhibits Pax6. Sp8 activates Pax6. Fgf8 activates Coup-tfi. Sp8 activates Coup-tfi. Fgf8 activates Sp8. Emx2 inhibits Sp8"
 
 
+    test_list = [
+        # (text_41, expected_41),
+        # (text_50, expected_50),
+        (text_44, expected_44),
+        # (text_60, expected_60)
+    ]
 
+    for t in test_list:
+        test, expected = t
+        result = nlp_runner(test)
 
+        expected_set = set([e.lstrip() for e in expected.split(". ")])
+        result_set = set([e.lstrip() for e in result.split(". ")])
 
+        matching_pairs = expected_set & result_set
+        unmatched_expected = expected_set - result_set
+        unmatched_result = result_set - expected_set
 
+        print(f"\nMatching Pairs: {matching_pairs}")
+        print(f"Unmatched Expected: {unmatched_expected}")
+        print(f"Unmatched Result: {unmatched_result}\n")
 
-
-    test1 = "The expression of SCR is reduced in shr mutants. ChIP-QRTPCR experiments show that SHR directly binds in vivo to the regulatory sequences of SCR and positively regulates its transcription.  In the scr mutant background promoter activity of SCR is absent in the QC and CEI. A ChIP-PCR assay confirmed that SCR directly binds to its own promoter and directs its own expression.  SCR mRNA expression as probed with a reporter lines is lost in the QC and CEI cells in jkd mutants from the early heart stage onward.  The double mutant jkd mgp rescues the expression of SCR in the QC and CEI, which is lost in the jkd single mutant.  The expression of MGP is severely reduced in the shr background. Experimental data using various approaches have suggested that MGP is a direct target of SHR. This result was later confirmed by ChIP-PCR.  SCR directly binds to the MGP promoter, and MGP expression is reduced in the scr mutant background.  The post-embryonic expression of JKD is reduced in shr mutant roots.  The post-embryonic expression of JKD is reduced in scr mutant roots.  WOX5 is not expressed in scr mutants.  WOX5 expression is reduced in shr mutants.  WOX5 expression is rarely detected in mp or bdl mutants.  PLT1 mRNA region of expression is reduced in multiple mutants of PIN genes, and it is overexpressed under ectopic auxin addition. PLT1 & 2 mRNAs are absent in the majority of mp embryos and even more so in mp nph4 double mutant embryos.  Overexpression of Aux/IAA genes represses the expression of DR5 both in the presence and absence of auxin. Domains III & IV of Aux/IAA genes interact with domains III & IV of ARF stabilizing the dimerization that represses ARF transcriptional activity.  Auxin application destabilizes Aux/IAA proteins. Aux/IAA proteins are targets of ubiquitin-mediated auxin-dependent degradation.  Wild type root treated with CLE40p show a reduction of WOX5 expression, whereas in cle40 loss of function plants WOX5 is overexpressed."
-
-    expected1 = "SHR activates SCR. SCR activates SCR. JKD activates SCR. MGP inhibits SCR. SHR activates MGP. SCR activates MGP. SHR activates JKD. SCR activates JKD. SCR activates WOX5. SHR activates WOX5. ARF (MP) activates WOX5. ARF activates PLT. Aux/IAA inhibits ARF. Auxin inhibits Aux/IAA. CLE40 inhibits WOX5"
-
-    result = "SCR activates shr.  SHR inhibits SCR.  mgp inhibits SCR.  MGP activates shr.  MGP inhibits SHR.  SCR inhibits MGP.  JKD activates shr.  shr activates W.  shr activates WOX5.  mp inhibits W.  mp inhibits WOX5.  mp inhibits mp.  ARF inhibits scr.  ARF inhibits ARF.  CLE40p inhibits W.  CLE40p inhibits WOX5. "
-
-    result1 = nlp_runner(test1) 
-
-    print(result1)
 
 if __name__ == '__main__':
     NLP_tester()

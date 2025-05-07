@@ -15,6 +15,7 @@
   --color-second: #E8FAEA; /* pastel green */
   --color-third: #46B47F; /* pastel dark green */
   --color-off: #E8FAEA; /* pastel green */
+  --color-dark: #6DD19C; /* pastel dark green */
 }
 
 @media (prefers-color-scheme: dark) {

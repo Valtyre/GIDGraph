@@ -130,7 +130,7 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
   `
   return (
     <div className="p-5 h-full w-full flex-1">
-      <h1 className="font-bold text-3xl text-third"> Graph <Infobox text={info}/> </h1>
+      <h1 className="font-bold text-3xl text-third"> Regulatory Network <Infobox text={info}/> </h1>
       <div
         id="network"
         ref={networkRef}
