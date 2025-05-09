@@ -96,7 +96,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-main ">
       {/* header bar */}
-      <TopBar onExport={graph ? exportGinml : undefined} />
+      <TopBar />
 
       {/* input area: natural language + SNL editor */}
       <div className="flex flex-row h-[400px]">
@@ -119,6 +119,7 @@ export default function Home() {
             lf={lf}
             setLF={setLF}
             geneColors={geneColors}
+            onExport={exportGinml} // Pass the export function here
           />
         </div>
       </div>
