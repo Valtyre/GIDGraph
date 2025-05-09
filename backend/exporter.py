@@ -27,6 +27,8 @@ def export_ginml(payload: dict) -> Response:
 
     graph = payload["graph"]
     formulas = payload["lf"]
+    
+    print(formulas)
 
     # collect every gene referenced in the model
     genes: set[str] = {f["targetGene"] for f in formulas}
@@ -136,3 +138,32 @@ def _circular_layout(n: int, *, centre: Tuple[int, int] = (300, 300), radius: in
         (int(cx + radius * math.cos(i * step)), int(cy + radius * math.sin(i * step)))
         for i in range(n)
     ]
+
+def parse_explicit_formula(formula_str: str) -> dict:
+    """Parse an explicit formula string into a formula dictionary."""
+    # Remove whitespace and split by '|'
+    components = [comp.strip() for comp in formula_str.split("|")]
+    
+    # Extract the target gene (first component)
+    target_gene = components[0] if components else ""
+    
+    # Extract incoming genes and their labels (if any)
+    incoming_genes = []
+    for comp in components[1:]:
+        if comp:  # Ignore empty components
+            label = comp[0]  # First character as label
+            gene = comp[1:] if len(comp) > 1 else comp  # Remainder as gene
+            incoming_genes.append({"gene": gene, "label": label})
+    
+    # Construct the formula dictionary
+    formula = {
+        "targetGene": target_gene,
+        "incomingGenes": incoming_genes,
+    }
+    
+    return formula
+
+# Example usage
+explicit_formula_str = "GATA46 | !NR2F2 | NOTCH"
+parsed_formula = parse_explicit_formula(explicit_formula_str)
+print(parsed_formula)

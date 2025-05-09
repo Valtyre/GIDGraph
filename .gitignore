@@ -9,3 +9,6 @@
 /backend/parser/__pycache__
 /backend/nlp/__pycache__
 /backend/__pycache__
+
+/model_unpacked/
+/unzipping/
