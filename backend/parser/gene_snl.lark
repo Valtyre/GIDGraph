@@ -12,7 +12,7 @@ knockout:   gene "knockout" "inhibits" gene  -> knockout
 binding:    gene "binds" gene       -> binding
 
 // terminals
-GENE: /[A-Za-z][A-Za-z0-9-]*/
+GENE: /[A-Za-z][A-Za-z0-9/-]*/
 %import common.WS
 %ignore WS
 
