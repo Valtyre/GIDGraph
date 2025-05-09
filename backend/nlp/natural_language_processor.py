@@ -5,7 +5,7 @@ import numpy as np
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
-from .biobert_genetic_ner import extract_genes
+from biobert_genetic_ner import extract_genes
 import re
 
 printer = True
@@ -34,7 +34,7 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
 
     for e in doc.ents:
         if e.label_ == "GENE_OR_GENE_PRODUCT": 
-            gene_list.append(e.text)
+            gene_list.append(e.text.upper())
     gene_list = list(set(gene_list))
         
     relationships: list[tuple[str, str, str, str, list[float], list[float]]] = []
@@ -72,7 +72,7 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
                         target = phrase
 
                 # ACTOR 
-                elif actor == None and (token.dep_ in ["nsubj", "nmod"]):
+                elif actor == None and (token.dep_ in ["nsubj", "nmod"]) and (token.dep_ not in ["nmod"] and token.head.dep_ != "nsubjpass"):
                     actor = token.text
 
                 # TARGET 
@@ -101,6 +101,9 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
             elif token.dep_ == "advcl" and token.head.dep_ == "ROOT":
                 root.append(token)
 
+            elif token.dep_ == "xcomp" and token.head.dep_ == "ROOT":
+                root.append(token)
+            
             elif token.dep_ == "amod" and token.head.lemma_ == "expression":
                 if token.head.head.dep_ == "ROOT":
                     root.append(token)
@@ -124,6 +127,9 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
 
             elif token.dep_ == "appos" and token.head.text in gene_list and token.head.text not in actor:
                     actor = token.head.text
+
+            elif token.dep_ == "ccomp" and token.head.dep_ == "ROOT":
+                root.append(token)
             
 
         # Shortest path
@@ -168,7 +174,7 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
     """Processes interactions by ensuring multiple genes are handled correctly and normalizing verbs."""
     
     activation_verbs = { "activate", "activation", "trigger", "enhance", "boost", "raise", "amplify", "upregulation", "improve", "induce", "stimulate", "upregulate", "increase", "promote", "auto-activating", "direct"}
-    repression_verbs = { "repress", "inhibit", 'hinder', "impede", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish", "lost", "lose", "decrease"}
+    repression_verbs = { "repress", "inhibit", 'hinder', "impede", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish", "lost", "lose", "decrease", "reduce"}
     
     parsed_interactions = []  # Store cleaned interactions
     seen_interactions = set()  # Track unique interactions
@@ -180,12 +186,12 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
 
         a, r, t, sent, a_sim, i_sim = interactions[i]  # Unpack tuple
         
-        if "knockout" in a + t:
+        if any(l in a + t for l in ["knockout", "mutant"]):
             knockout = True
 
         # Handle multiple genes in subject (a) or target (t)
-        a_genes = list(set([gene for gene in gene_list if any([gene == act for act in a.split()])]))
-        t_genes = list(set([gene for gene in gene_list if any([gene == tar for tar in t.split()])]))
+        a_genes = list(set([gene for gene in gene_list if any([gene == act.upper() for act in a.split()])]))
+        t_genes = list(set([gene for gene in gene_list if any([gene == tar.upper() for tar in t.split()])]))
 
         # Standardize the relation type (r)
         for i, verb in enumerate(r):
@@ -252,6 +258,7 @@ def nlp_runner(text: str) -> str:
 
     genes = extract_genes(text)
     interactions =  interaction_evaluator(matcher(doc, genes), genes)
+    if printer: print(genes)
 
     return interactions
 

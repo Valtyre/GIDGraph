@@ -113,7 +113,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
                 }}
                 className={`bg-third font-bold rounded-sm mt-4 p-2 w-fit text-main ${cursor === "wait" ? "cursor-wait" : "cursor-default"} hover:bg-dark`}
                 >
-                Example 2
+                Example 3
               </button>
                 </div>
           </div>
