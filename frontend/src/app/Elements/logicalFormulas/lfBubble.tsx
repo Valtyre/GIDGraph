@@ -37,12 +37,9 @@ export default function LogicalFormulasBubble({
             {hasNext && (
               <button
                 onClick={() => onToggle(lf.targetGene, idx)}
-                className={`mx-1 px-2 py-0.5 rounded-full text-xs font-semibold
-                  ${
-                    ig.truthValue
-                      ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                      : "bg-rose-600 text-white hover:bg-rose-500"
-                  }`}
+                className={`mx-1 px-3 py-1 rounded-md text-xs font-semibold
+                  bg-gray-400 hover:bg-gray-500
+                  ${ig.truthValue ? "text-black" : "text-white"}`}
               >
                 {ig.truthValue ? "AND" : "OR"}
               </button>

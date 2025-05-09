@@ -22,7 +22,7 @@ export function buildLogicalFormulas(graph: Graph | null): LF[] {
     entry.push({
       gene: edge.from,
       label: edge.label === "activation", // true for activation
-      truthValue: true                   // default = is set to AND
+      truthValue: false                   // default = is set to OR
     });
 
     map.set(edge.to, entry);
