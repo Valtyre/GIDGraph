@@ -50,11 +50,11 @@ export default function LogicalFormulasContainer({
   if (!lf.length)
     return (
       <>
-        <h1 className="font-bold text-3xl text-third">
+        <h1 className="font-bold text-3xl text-third" role="Heading">
           Logical Formulas
           <Infobox text={info} />
         </h1>
-        <div className="text-center text-gray-400 mt-4">
+        <div className="text-center text-black mt-4">
           No logical formulas yet
         </div>
       </>
@@ -62,7 +62,7 @@ export default function LogicalFormulasContainer({
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      <h1 className="font-bold text-3xl text-third">
+      <h1 className="font-bold text-3xl text-third" role="Heading">
         Logical Formulas
         <Infobox text={info} />
       </h1>

@@ -11,11 +11,11 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-main: #C5D5EA; /* pastel teal */
+  --color-main: #CED9E7; /* pastel teal */
   --color-second: #F2F9FF; /* pastel green */
-  --color-third: #759EB8; /* pastel dark green */
+  --color-third: #3567A4; /* pastel dark green */
   --color-off: #F2F9FF; /* pastel green */
-  --color-dark: #6BA3C6; /* pastel dark green */
+  --color-dark: #1D559A; /* pastel dark green */
 }
 
 @media (prefers-color-scheme: dark) {

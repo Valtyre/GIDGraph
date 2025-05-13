@@ -94,27 +94,27 @@ export default function Home() {
 
   /* ────────────────────────── JSX ─────────────────────────── */
   return (
-    <div className="min-h-screen bg-main ">
+    <main className="min-h-screen bg-main ">
       {/* header bar */}
       <TopBar />
 
       {/* input area: natural language + SNL editor */}
-      <div className="flex flex-row h-[400px]">
+      <section className="flex flex-row h-[400px]">
         <NatrualLanguageBox fun={setGraph} graph={graph} />
         <SNLBox 
           graph={graph ?? emptyGraph} 
           setGeneList={setGraph}
           geneColors={geneColors}
         />
-      </div>
+      </section>
 
       {/* main content: graph (65 %)  |  logical formulas (35 %) */}
-      <div className="flex flex-row">
+      <section className="flex flex-row">
         <div className="flex-[2]">
           <GeneNetworkGraph graph={graph} geneColors={geneColors} />
         </div>
 
-        <div className="flex-[1] overflow-y-auto max-h-[600px] p-4">
+        <div className="flex-[1] overflow-y-auto max-h-[600px] p-4" tabIndex={0}>
           <LogicalFormulasContainer
             lf={lf}
             setLF={setLF}
@@ -122,8 +122,8 @@ export default function Home() {
             onExport={exportGinml} // Pass the export function here
           />
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 /* ─────────────────────────────────────────────────────────────────────── */

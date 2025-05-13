@@ -5,8 +5,10 @@ import numpy as np
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
-from .biobert_genetic_ner import extract_genes
+from biobert_genetic_ner import extract_genes
 import re
+from spacy.pipeline.textcat import Config
+from spacy.training import Example
 
 printer = True
 
@@ -41,6 +43,8 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
 
     for i, sent in enumerate(doc.sents): 
 
+        # print("CAT:", sent.as_doc().cats)
+
         if i == 0:
             activate = sent[1]
             continue
@@ -66,13 +70,19 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
                 if token.dep_ == "compound" or token.dep_ == "amod":
                     phrase = get_compound_phrase(token.head)
                     if (printer): print("Compound phrase:", '\033[36m', phrase, '\033[0m')
-                    if (actor == None or token.text == actor) and (token.head.dep_ in ["nsubj", "nmod"]):
+                    if (actor == None or token.text == actor) and (token.head.dep_ in ["nsubj"] or (token.head.dep_ in ["nmod"] and token.head.head.dep_ != "nsubjpass")):
                         actor = phrase
                     elif (target == None or token.text == target) and (token.head.dep_ in ["dobj", "nsubjpass", "nmod"]):
                         target = phrase
-
+                    
+                    elif token.dep_ == "conj":
+                        if actor != None and token.head.text in actor:
+                            actor += " and " + token.text
+                        elif target != None and token.head.text in target:
+                            target += " and " + token.text
+                            
                 # ACTOR 
-                elif actor == None and (token.dep_ in ["nsubj", "nmod"]) and (token.dep_ not in ["nmod"] and token.head.dep_ != "nsubjpass"):
+                elif actor == None and ((token.dep_ in ["nsubj"]) or (token.dep_ in ["nmod"] and token.head.dep_ != "nsubjpass" )):
                     actor = token.text
 
                 # TARGET 
@@ -104,8 +114,8 @@ def matcher(doc: Doc, gene_list: list) -> list[tuple[str, str, str, Span]]:
             elif token.dep_ == "xcomp" and token.head.dep_ == "ROOT":
                 root.append(token)
             
-            elif token.dep_ == "amod" and token.head.lemma_ == "expression":
-                if token.head.head.dep_ == "ROOT":
+            elif token.dep_ == "amod":
+                if token.head.head.dep_ == "ROOT" and token.head.lemma_ == "expression":
                     root.append(token)
                 elif token.text == "own":
                     if actor != None:
@@ -173,8 +183,8 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
     
     """Processes interactions by ensuring multiple genes are handled correctly and normalizing verbs."""
     
-    activation_verbs = { "activate", "activation", "trigger", "enhance", "boost", "raise", "amplify", "upregulation", "improve", "induce", "stimulate", "upregulate", "increase", "promote", "auto-activating", "direct"}
-    repression_verbs = { "repress", "inhibit", 'hinder', "impede", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish", "lost", "lose", "decrease", "reduce"}
+    activation_verbs = { "activate", "activation", "trigger", "enhance", "boost", "raise", "amplify", "upregulation", "improve", "induce", "stimulate", "upregulate", "increase", "promote", "auto-activating", "direct", "positive", "positivly", "positively"}
+    inhibition_verbs = { "repress", "inhibit", 'hinder', "impede", "inhibition", "downregulate", "downregulation", "suppress", "loose", "inactive", "diminish", "lost", "lose", "decrease", "reduce", "negative", "negatively", "negatively"}
     
     parsed_interactions = []  # Store cleaned interactions
     seen_interactions = set()  # Track unique interactions
@@ -199,13 +209,13 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
                 if verb.text.split()[1] in activation_verbs: 
                     r = "inhibits"
                     break
-                elif verb.text.split()[1] in repression_verbs:
+                elif verb.text.split()[1] in inhibition_verbs:
                     r = "activates"
                     break
-            if verb.lemma_ in activation_verbs:
+            if verb.lemma_ in activation_verbs or any(v in verb.text.split() for v in activation_verbs):
                 r = "activates"
                 break
-            elif verb.lemma_ in repression_verbs: 
+            elif verb.lemma_ in inhibition_verbs or any(v in verb.text.split() for v in inhibition_verbs):
                 r = "inhibits"
                 break
 
@@ -213,7 +223,7 @@ def interaction_evaluator(interactions: list[tuple[str, list[Token], str, str, l
             for token in sent:
                 if token in activation_verbs:
                     r = "activates"
-                elif token in repression_verbs:
+                elif token in inhibition_verbs:
                     r = "inhibits"
             if max(a_sim) >  max(i_sim): 
                     r = "activates"
@@ -270,7 +280,38 @@ if __name__ == '__main__':
 
     nlp.tokenizer = geneTokenizer(nlp)
 
-    text_41 = "GATA46 enhances HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout. IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling."
+    # config = Config().from_str("model @architectures = 'spacy.TextCatBOW.v1'")
+    # textcat = nlp.add_pipe("textcat", config=config)
+
+    # # Add matching labels
+    # textcat.add_label("ACTIVATION")
+    # textcat.add_label("INHIBITION")
+
+    # # Prepare training data
+    # train_texts = ["GENE1 activates GENE2.", "GENE1 inhibits GENE2."]
+    # train_cats  = [
+    #     {"ACTIVATION": 1.0, "INHIBITION": 0.0},
+    #     {"ACTIVATION": 0.0, "INHIBITION": 1.0},
+    # ]
+
+    # examples = []
+    # for txt, cats in zip(train_texts, train_cats):
+    #     doc = nlp.make_doc(txt)
+    #     examples.append(Example.from_dict(doc, {"cats": cats}))
+
+    # # Train the textcat
+    # optimizer = nlp.initialize()
+    # for epoch in range(10):
+    #     losses = {}
+    #     nlp.update(examples, sgd=optimizer, drop=0.2, losses=losses)
+    #     print(f"Epoch {epoch+1}  Losses: {losses}")
+
+    # # Test prediction
+    # test_sent = "GATA46 enhances HEY2 expression."
+    # doc = nlp(test_sent)
+    # print(f"{test_sent!r} →", doc.cats)
+
+    text_41 = "GATA46 does not enhance HEY2 expression. GATA46 directly activates HAND2 expression. IRX4 expression is lost by HAND2 knockout. IRX4 contributes to activating MYL2. IRX4 activates HAND2. NR2F2 represses IRX4 gene expression. NR2F2 represses MYL2. NR2F2 represses HEY2 gene. NR2F2 binds to genomic loci of MYL7 and expression is lost in NR2F2 knockout cells. Ectopic MYL7 (and other atrial genes) expression is observed in HEY2 knockout ventricles. Expression of HEY2 is increased by NOTCH signalling."
     text_50 = "In CMs derived by human induced pluripotent stem cells, GATA6 and GATA4 directly activate HAND2 expression. In mice cells, GATA proteins (together with TBX20 ) enhance HEY2 expression in ventricular CMs. In mice cells, IRX4 expression is lost by HAND2 (with/or NKX2.5 ) knockout ventricular CMs. IRX contributes to activating ventricular genes and supressing atrial genes. IRX4 activates both HAND1 and HAND2. IRX4 activates also HAND1. In atrial cells derived by human induced embryonic stem cells, COUP-TFII, a transcription factor encoded by the NR2F2 gene, is robustly upregulated in response to RA during directed atrial differentiation. In mice cardiac cells, COUP-TFII represses IRX4 gene expression in CMs via direct binding to COUP-TFII response elements at the IRX4 genomic loci. In mice cardiac cells, COUP-TFII represses MYL2 gene expression through binding to multiple chromatin sites. In mice cardiac cells, COUP-TFII represses HEY2 gene expression in CMs via direct binding to COUP-TFII response elements at the HEY2 genomic loci. In mice cardiac cells, COUP-TFII binds to genomic loci of MYL7 and expression is lost in COUP-TFII knockout cells. In mice cells, ectopic MYL7 (and other atrial genes') expression is observed in HEY2 knockout ventricles. In mice cells, expression of HEY2 is increased by NOTCH signalling."
     text_44 = "The expression of SCR is reduced in shr mutants. ChIP-QRTPCR experiments show that SHR directly binds in vivo to the regulatory sequences of SCR and positively regulates its transcription. In the scr mutant background promoter activity of SCR is absent in the QC and CEI. A ChIP-PCR assay confirmed that SCR directly binds to its own promoter and directs its own expression. SCR mRNA expression as probed with a reporter lines is lost in the QC and CEI cells in jkd mutants from the early heart stage onward. The double mutant jkd mgp rescues the expression of SCR in the QC and CEI, which is lost in the jkd single mutant. The expression of MGP is severely reduced in the shr background. Experimental data using various approaches have suggested that MGP is a direct target of SHR. This result was later confirmed by ChIP-PCR. SCR directly binds to the MGP promoter, and MGP expression is reduced in the scr mutant background. The post-embryonic expression of JKD is reduced in shr mutant roots. The post-embryonic expression of JKD is reduced in scr mutant roots. WOX5 is not expressed in scr mutants. WOX5 expression is reduced in shr mutants. WOX5 expression is rarely detected in mp or bdl mutants. PLT1 mRNA region of expression is reduced in multiple mutants of PIN genes, and it is overexpressed under ectopic auxin addition. PLT1 &2 mRNAs are absent in the majority of mp embryos and even more so in mp nph4 double mutant embryos. Overexpression of Aux/IAA genes represses the expression of DR5 both in the presence and absence of auxin. Domains III & IV of Aux/IAA genes interact with domains III & IV of ARF stabilizing the dimerization that represses ARF transcriptional activity. Auxin application destabilizes Aux/IAA proteins. Aux/IAA proteins are targets of ubiquitin-mediated auxin-dependent degradation. Wild type root treated with CLE40p show a reduction of WOX5 expression, whereas in cle40 loss of function plants WOX5 is overexpressed."
     text_60 = "In the anterior signaling center, Fgf8 establishes the low anterior-graded expression of the TFs Emx2 and COUP-TFI by repression, and promotes the high anterior gradient of Sp8 expression.Fgf8 expression is also regulated positively by direct transcriptional activation by Sp8 through its binding to Fgf8 regulatory elements, and indirectly by Emx2, which represses the ability of Sp8 to directly induce Fgf8, as described in Figure 2. The asterisk marking the activation of Fgf8 by Sp8 indicates the only interaction that has been shown to be due to direct binding and transcriptional activation. Putative posterior signaling molecules Bmps and Wnts, expressed in the cortical hem, positively regulate the high caudal gradient of Emx2 expression. Genetic interactions between TFs also participate in the establishment of their graded expression. For example, Emx2 and Pax6 mutually suppress each other’s expression, Coup-TFI suppresses Pax6 expression and enhances Emx2 expression, and Sp8 suppresses Emx2 expression. Those changes to the expression patterns were identified in the knockout mice; thus, these interactions do not necessarily imply direct control of one TF on another. For instance, Emx2 suppression by Sp8 might be due to an enhancement of Fgf8 expression, which in turn acts negatively on Emx2 expression."
@@ -283,11 +324,13 @@ if __name__ == '__main__':
 
     genes = extract_genes(text)
 
-
+    test = nlp("This is amazing!")
+    print(doc.cats)
 
     interactions =  interaction_evaluator(matcher(doc, genes), genes)
     # print(interactions)
 
 
 
-    # print(genes)
+
+

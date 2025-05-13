@@ -29,7 +29,7 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
       : 'bg-red-500 hover:bg-red-600';
 
   return (
-    <div className="flex w-full max-w-[800px] mx-auto items-center gap-3 p-3 bg-second rounded-md relative">
+    <div className="flex w-full max-w-[800px] mx-auto items-center gap-3 p-3 bg-second rounded-md relative" tabIndex={0}>
       <button
         className=" py-1 text-4xl font-bold text-third hover:text-dark"
         onClick={onRemove}
