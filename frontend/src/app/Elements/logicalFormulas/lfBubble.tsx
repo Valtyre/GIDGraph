@@ -2,22 +2,19 @@ import { LogicalFormula } from "./lfContainer";
 
 type ToggleFn = (targetGene: string, idx: number) => void;
 
-export default function LogicalFormulasBubble({
-  lf,
-  geneColors,
-  onToggle,
-}: {
+type LogicalFormulasBubbleProps = {
   lf: LogicalFormula;
   geneColors: Record<string, string>;
   onToggle: ToggleFn;
-}) {
-  /* colour for target gene */
-  const geneColor = geneColors[lf.targetGene] ?? "#9ca3af"; // Tailwind gray‑400 fallback
+};
+
+export default function LogicalFormulasBubble({lf, geneColors, onToggle,}: LogicalFormulasBubbleProps) {
+  const geneColor = geneColors[lf.targetGene] ?? "#9ca3af"; 
 
   return (
     <div
       className="bg-gray-100 text-gray-900 px-3 py-2 rounded shadow mb-1"
-      style={{ border: `5px solid ${geneColor}` }}      /* ← coloured border */
+      style={{ border: `5px solid ${geneColor}` }}
     >
       <span className="font-bold">{lf.targetGene}</span>{" = "}
       {lf.incomingGenes.map((ig, idx) => {
@@ -26,7 +23,6 @@ export default function LogicalFormulasBubble({
 
         return (
           <span key={idx} className="inline-flex items-center">
-            {/* coloured badge for each regulator */}
             <span
               className="rounded-full px-2 py-0.5 text-xs font-semibold mr-1 text-gray-900"
               style={{ backgroundColor: badgeColor }}

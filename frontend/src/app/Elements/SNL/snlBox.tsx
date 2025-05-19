@@ -18,7 +18,13 @@ export type Interaction = {
   id: number
 }
 
-export function SNLBox({graph, setGeneList, geneColors}: {graph: Graph, setGeneList: Dispatch<SetStateAction<Graph | null>>, geneColors: Record<string,string>}) {
+type SNLBoxProps = {
+  graph: Graph,
+  setGeneList: Dispatch<SetStateAction<Graph | null>>,
+  geneColors: Record<string, string>
+}
+
+export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
   
   const [geneList, nodes] = [graph.edges , graph.node]
   const uniqueID = useRef(geneList.length+1);

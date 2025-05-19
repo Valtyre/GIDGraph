@@ -2,7 +2,7 @@ import { useSignal } from '@preact/signals-react';
 import { Interaction } from './snlBox';
 import { useState } from 'react';
 
-type Props = {
+type GeneInteractionProps = {
   interaction: Interaction;
   geneColors: Record<string,string>;
   onFlip: () => void;
@@ -12,7 +12,7 @@ type Props = {
   changeTo: (i: Interaction, s: string) => void;
 };
 
-export default function GeneInteractionBubble({ interaction, geneColors, onToggleType, onRemove, changeFrom, changeTo}: Props) {
+export default function GeneInteractionBubble({ interaction, geneColors, onToggleType, onRemove, changeFrom, changeTo}: GeneInteractionProps) {
   
   const fromColor = geneColors[interaction.from] ?? "#9ca3af"
   const toColor = geneColors[interaction.to] ?? "#9ca3af" 
@@ -21,7 +21,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
   const [textTo, setTextTo] = useState(interaction.to);
   
   const { from, label, to } = interaction;
-
 
   const buttonColor =
     label == "activation"
@@ -38,7 +37,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         ×
       </button>
 
-
       <input type="text"
         className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
         style={{ border: `5px solid ${fromColor}` }}    
@@ -50,7 +48,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         }}
       />
 
-
       <div className="flex flex-col items-center gap-2">
         <button
           className={`border-gray-400 rounded-md px-3 py-1 min-w-22 ${buttonColor}`}
@@ -58,13 +55,6 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         >
           {label == "activation" ? 'activates' : 'inhibits'}
         </button>
-
-        {/* <button
-          className="bg-white border border-gray-400 rounded-md px-3 py-1 hover:bg-gray-100 min-w-25"
-          onClick={onFlip}
-        >
-          &#8596;
-        </button> */}
       </div>
 
       <input type="text"
