@@ -10,10 +10,12 @@
 /backend/nlp/__pycache__
 /backend/__pycache__
 
+/backend/nlp/__pycache__/
+
 /model_unpacked/
 /unzipping/
 
 /*.ginml
 
-/nginx/logs/*         # ignore everything in nginx/logs
-!/nginx/logs/.gitkeep # except the placeholder
+/nginx/logs/*         
+!/nginx/logs/.gitkeep 
