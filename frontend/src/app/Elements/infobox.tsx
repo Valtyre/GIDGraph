@@ -4,7 +4,7 @@ export function Infobox({ text }: { text: string }) {
         {/* Info icon */}
         <span className="cursor-pointer">&#9432;</span>
   
-        {/* Tooltip popup */}
+        {/* Popup */}
         <aside
           className="
             absolute z-10 hidden

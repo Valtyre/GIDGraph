@@ -1,6 +1,6 @@
 import { Infobox } from "../infobox";
 import LogicalFormulasBubble from "./lfBubble";
-import ExportButton from "./ExportButton"; // Import the new ExportButton component
+import ExportButton from "./ExportButton"; 
 
 /* ----- types (unchanged) ----- */
 export type incomingGene = {
@@ -13,19 +13,14 @@ export type LogicalFormula = {
   targetGene: string;
   incomingGenes: incomingGene[];
 };
-/* ----------------------------- */
 
-export default function LogicalFormulasContainer({
-  lf,
-  setLF,
-  geneColors,
-  onExport,
-}: {
-  lf: LogicalFormula[];
-  setLF: React.Dispatch<React.SetStateAction<LogicalFormula[]>>;
-  geneColors: Record<string, string>;
-  onExport: () => void;
-}) {
+type LogicalFormulasContainerProps = {
+  lf: LogicalFormula[], 
+  setLF: React.Dispatch<React.SetStateAction<LogicalFormula[]>>, 
+  geneColors: Record<string, 
+  string>; onExport: () => void;}
+
+export default function LogicalFormulasContainer({lf, setLF, geneColors, onExport}: LogicalFormulasContainerProps) {
   /* toggle function passed down to each bubble */
   const toggleConnector = (targetGene: string, idx: number) => {
     setLF((prev) =>
@@ -44,8 +39,7 @@ export default function LogicalFormulasContainer({
 
   const info = `
   In this field, the logical formulas derived from the gene interactions is shown. Click the 'and' and 'or' buttons to switch between.
-  The user can export these logical formulas to GINML, for use in GinSim.
-  `;
+  The user can export these logical formulas to GINML, for use in GinSim.`;
 
   if (!lf.length)
     return (

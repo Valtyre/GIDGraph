@@ -10,10 +10,10 @@ import { Interaction } from "../SNL/snlBox";
  *   • label = false => inhibition
  *   • truthValue default = false   (checkbox unchecked)
  */
+
 export function buildLogicalFormulas(graph: Graph | null): LF[] {
   if (!graph) return [];
 
-  // Map targetGene -> incomingGenes[]
   const map = new Map<string, LF["incomingGenes"]>();
 
   graph.edges.forEach((edge: Interaction) => {

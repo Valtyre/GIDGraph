@@ -109,12 +109,12 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
         },
       },
       edges: {
-        width: 2,                     // ← increase line thickness
+        width: 2,
         arrows: {
           to: {
             enabled: true,
             type: 'arrow',
-            scaleFactor: 2,           // ← enlarge arrow head
+            scaleFactor: 2,
           },
         },
         font: { size: 0 },

@@ -9,6 +9,9 @@
 /backend/parser/__pycache__
 /backend/nlp/__pycache__
 /backend/__pycache__
+/backend/nlp/images/
+.DS_Store
+
 
 /backend/nlp/__pycache__/
 
