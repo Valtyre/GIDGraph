@@ -12,3 +12,8 @@
 
 /model_unpacked/
 /unzipping/
+
+/*.ginml
+
+/nginx/logs/*         # ignore everything in nginx/logs
+!/nginx/logs/.gitkeep # except the placeholder
