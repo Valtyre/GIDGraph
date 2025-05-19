@@ -1,8 +1,0 @@
-178.211.139.123 - - [05/May/2025:20:37:37 +0200] "GET / HTTP/1.1" 301 169 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36 Edg/90.0.818.46"
-87.49.42.75 - - [05/May/2025:20:42:49 +0200] "GET / HTTP/1.1" 301 169 "-" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36"
-87.49.42.75 - - [05/May/2025:20:42:49 +0200] "GET / HTTP/1.1" 200 615 "-" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36"
-87.49.42.75 - - [05/May/2025:20:42:50 +0200] "GET /favicon.ico HTTP/1.1" 404 555 "https://api.gidgraph.com/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36"
-34.141.151.163 - - [05/May/2025:20:49:26 +0200] "GET / HTTP/1.1" 200 615 "-" "Scrapy/2.12.0 (+https://scrapy.org)"
-20.150.202.103 - - [05/May/2025:21:04:00 +0200] "GET / HTTP/1.1" 200 615 "-" "Mozilla/5.0 zgrab/0.x"
-192.168.50.1 - - [05/May/2025:21:04:08 +0200] "GET / HTTP/1.1" 200 615 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
-192.168.50.1 - - [05/May/2025:21:04:09 +0200] "GET /favicon.ico HTTP/1.1" 404 555 "https://api.gidgraph.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
