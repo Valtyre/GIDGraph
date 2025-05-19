@@ -5,7 +5,7 @@ import numpy as np
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
-from biobert_genetic_ner import extract_genes
+from .biobert_genetic_ner import extract_genes
 import re
 from spacy.pipeline.textcat import Config
 from spacy.training import Example

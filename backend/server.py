@@ -1,4 +1,4 @@
-# server.py (inside backend/ folder)
+# server.py 
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +10,6 @@ from backend.exporter import router as exporter_router
 app = FastAPI()
 
 # List the domains (origins) that are allowed to talk to this API.
-# For local development with React/Next on port 3000, add that:
 origins = [
     # "http://localhost:3000",
     # "http://127.0.0.1:3000",
@@ -23,13 +22,13 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,           # or ["*"] to allow all
+    allow_origins=origins,          
     allow_credentials=True,
-    allow_methods=["*"],             # e.g. ["GET", "POST"] if you want to restrict
+    allow_methods=["*"],           
     allow_headers=["*"],
 )
 
-# Define a Pydantic model for the incoming JSON body
+# Defining a Pydantic model for the incoming JSON body
 class TextInput(BaseModel):
     text: str
 
