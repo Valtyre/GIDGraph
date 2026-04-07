@@ -75,7 +75,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
     <section
       role="region"
       aria-labelledby="nl-form-title"
-      className="flex flex-col w-full p-5 lg:p-6"
+      className="flex flex-col w-full h-full p-5 lg:p-6 overflow-hidden"
     >
       {/* Section heading */}
       <h2
@@ -104,7 +104,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
       {/* Text input area */}
       <textarea
         className={`
-          w-full h-full min-h-[200px]
+          w-full flex-1 min-h-[100px]
           p-4 
           bg-off border-2 border-third/30 
           rounded-lg

@@ -3,6 +3,7 @@
 # Directories
 /SpaCyEnv
 .env
+.venv
 #/backend/graphOutputs
 
 #Caches
