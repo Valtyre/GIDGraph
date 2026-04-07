@@ -2,7 +2,7 @@
 
 import { Graph } from "@/app/page";
 import GeneInteractionBubble from "./geneInteractionBubble";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import { AddButton } from "./addButton";
 import { Infobox } from "../infobox";
 
@@ -43,7 +43,6 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
       };
       setGeneList({edges: snl, node: nodes});
     }
-    console.log(geneList)
   }
 
   function toggleType(interaction: Interaction): void {
@@ -58,7 +57,6 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
       };
       setGeneList({edges: snl, node: nodes});
     }
-    console.log(geneList)
   }
 
   function createInteraction(i: { from: string; label: InteractionType; to: string, id: number }) {
@@ -75,7 +73,6 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
 
   function addInteraction(){
       createInteraction(interactionTemplate)
-      console.log(geneList)
   }
 
   function removeInteraction(i: Interaction): void {
@@ -93,10 +90,10 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
         from: s,
       };
       setGeneList({edges: snl, node: nodes});
-    } console.log(geneList)
+    }
   }
-  function changeT(interaction: Interaction, s: string): void {
 
+  function changeT(interaction: Interaction, s: string): void {
     const snl = [...geneList];
     const index = snl.findIndex((i) => i.id === interaction.id);
       
@@ -106,33 +103,61 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
         ...current,
         to: s,
       };
-
       setGeneList({edges: snl, node: nodes});
-    } console.log(geneList)
+    }
   }
 
   const info = `
   In this field you can add, remove and edit gene interactions. You can do this by clicking on the different elements. 
   These changes will be reflected in the visualisation, but changing elements here will not impact the natural language discriptions.
   `
-  return (
-    <div className="flex flex-col mx-auto w-full p-5">
-      <h1 className="font-bold text-3xl text-third" role="Heading">Semi-Natural Language <Infobox text={info}/> </h1>
-      <div className="flex flex-col p-3 gap-2 overflow-scroll bg-off border-2 border-third rounded-sm" tabIndex={0}>
-      {geneList ? geneList.map((inter) => (
-        <GeneInteractionBubble key={inter.id}
-          interaction={inter}
-          geneColors={geneColors}
-          onFlip={() => flipInteraction(inter)}
-          onToggleType={() => toggleType(inter)}
-          onRemove={() => removeInteraction(inter)}
-          changeFrom={changeF}
-          changeTo={changeT}
-          />
-        )) : []}
-        <AddButton add={addInteraction}/>
 
+  return (
+    <section 
+      className="flex flex-col w-full p-5 lg:p-6"
+      role="region"
+      aria-labelledby="snl-title"
+    >
+      <h2 id="snl-title" className="section-heading text-2xl lg:text-3xl">
+        Semi-Natural Language
+        <Infobox text={info}/>
+      </h2>
+
+      <div 
+        className="
+          flex flex-col gap-3 p-4
+          h-full overflow-y-auto
+          bg-off border-2 border-third/30 
+          rounded-lg
+          custom-scrollbar
+          transition-colors duration-200
+          hover:border-third/50
+        "
+        tabIndex={0}
+        role="list"
+        aria-label="Gene interactions list"
+      >
+        {geneList && geneList.length > 0 ? (
+          geneList.map((inter) => (
+            <GeneInteractionBubble 
+              key={inter.id}
+              interaction={inter}
+              geneColors={geneColors}
+              onFlip={() => flipInteraction(inter)}
+              onToggleType={() => toggleType(inter)}
+              onRemove={() => removeInteraction(inter)}
+              changeFrom={changeF}
+              changeTo={changeT}
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 py-8">
+            No interactions yet. Add one below or convert text above.
+          </p>
+        )}
+        
+        <AddButton add={addInteraction}/>
       </div>
-    </div>
+    </section>
   );
 }

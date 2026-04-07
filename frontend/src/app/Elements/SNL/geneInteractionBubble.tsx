@@ -1,4 +1,3 @@
-import { useSignal } from '@preact/signals-react';
 import { Interaction } from './snlBox';
 import { useState } from 'react';
 
@@ -22,50 +21,111 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
   
   const { from, label, to } = interaction;
 
-  const buttonColor =
-    label == "activation"
-      ? 'bg-green-500 hover:bg-green-600'
-      : 'bg-red-500 hover:bg-red-600';
+  const isActivation = label === "activation";
 
   return (
-    <div className="flex w-full max-w-[800px] mx-auto items-center gap-3 p-3 bg-second rounded-md relative" tabIndex={0}>
+    <div 
+      className="
+        flex w-full max-w-[800px] mx-auto items-center gap-3 
+        p-3 
+        bg-second rounded-lg 
+        shadow-sm
+        transition-shadow duration-200
+        hover:shadow-md
+      " 
+      role="listitem"
+      tabIndex={0}
+    >
+      {/* Delete button */}
       <button
-        className=" py-1 text-4xl font-bold text-third hover:text-dark"
+        className="
+          flex items-center justify-center
+          w-8 h-8 
+          text-2xl font-bold 
+          text-third/70
+          rounded-full
+          transition-all duration-150
+          hover:bg-third/10 hover:text-third
+          focus:bg-third/10 focus:text-third
+        "
         onClick={onRemove}
-        aria-label="Delete"
+        aria-label="Delete interaction"
+        title="Delete interaction"
       >
         ×
       </button>
 
-      <input type="text"
-        className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
-        style={{ border: `5px solid ${fromColor}` }}    
+      {/* From gene input */}
+      <input 
+        type="text"
+        className="
+          flex-1 min-w-0
+          text-center text-base
+          bg-main text-foreground 
+          px-3 py-2 
+          rounded-lg
+          border-4
+          transition-all duration-150
+          focus:outline-none focus:ring-2 focus:ring-offset-1
+        "
+        style={{ 
+          borderColor: fromColor,
+          boxShadow: `0 0 0 0 ${fromColor}` 
+        }}    
         value={textFrom}
         onChange={(e) => {
           const value = e.target.value;
           changeFrom(interaction, value);
           setTextFrom(value);
         }}
+        placeholder="Gene..."
+        aria-label="Source gene"
       />
 
-      <div className="flex flex-col items-center gap-2">
-        <button
-          className={`border-gray-400 rounded-md px-3 py-1 min-w-22 ${buttonColor}`}
-          onClick={onToggleType}
-        >
-          {label == "activation" ? 'activates' : 'inhibits'}
-        </button>
-      </div>
+      {/* Interaction type toggle */}
+      <button
+        className={`
+          px-4 py-2 min-w-[100px]
+          text-sm font-semibold text-white
+          rounded-lg
+          transition-all duration-150
+          ${isActivation 
+            ? 'btn-activation' 
+            : 'btn-inhibition'
+          }
+        `}
+        onClick={onToggleType}
+        aria-label={`Toggle interaction type, currently ${label}`}
+        title="Click to toggle between activation and inhibition"
+      >
+        {isActivation ? 'activates' : 'inhibits'}
+      </button>
 
-      <input type="text"
-        className="text-center bg-main text-[18px] text-black focus:outline-none focus:ring-0 px-2 py-1 w-full flex-1 rounded border-4"
-        style={{ border: `5px solid ${toColor}` }}    
+      {/* To gene input */}
+      <input 
+        type="text"
+        className="
+          flex-1 min-w-0
+          text-center text-base
+          bg-main text-foreground 
+          px-3 py-2 
+          rounded-lg
+          border-4
+          transition-all duration-150
+          focus:outline-none focus:ring-2 focus:ring-offset-1
+        "
+        style={{ 
+          borderColor: toColor,
+          boxShadow: `0 0 0 0 ${toColor}` 
+        }}    
         value={textTo}
         onChange={(e) => {
           const value = e.target.value;
           changeTo(interaction, value);
           setTextTo(value);
         }}
+        placeholder="Gene..."
+        aria-label="Target gene"
       />
     </div>
   );
