@@ -18,6 +18,7 @@ import GeneNetworkGraph from './Elements/graph';
 import LogicalFormulasContainer, {
   LogicalFormula as LF,
 } from './Elements/logicalFormulas/lfContainer';
+import { buildApiUrl } from '../lib/apiConfig';
 
 /* ── helpers ──────────────────────────────────────────────────────────── */
 import { buildLogicalFormulas } from './Elements/logicalFormulas/lfBuilder';
@@ -51,7 +52,7 @@ export default function Home() {
     if (!graph || isExporting) return;    // nothing to export or already exporting
 
     setIsExporting(true);
-    fetch("https://api.gidgraph.com/api/export_ginml", {
+    fetch(buildApiUrl("/api/export_ginml"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ graph, lf }),   // send current state

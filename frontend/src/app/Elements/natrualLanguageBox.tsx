@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Infobox } from "./infobox";
 import { Graph } from "../page";
+import { buildApiUrl } from "../../lib/apiConfig";
 
 export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetStateAction<Graph | null>>, graph: Graph | null }) {
   const [text, setText] = useState("");
@@ -39,7 +40,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
     document.body.style.cursor = "wait";
 
     try {
-      const res = await fetch("https://api.gidgraph.com/api/parse", {
+      const res = await fetch(buildApiUrl("/api/parse"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: nlText }),
