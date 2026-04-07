@@ -20,13 +20,19 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
     }
   }, [graph]);
 
-  // Check if graph has changed
+  // Check if graph has changed - only show warning if there's actual content
   useEffect(() => {
+    // Don't show warning if both text and graph are empty
+    if (!text.trim() && (!graph || graph.edges.length === 0)) {
+      setGraphModified(false);
+      return;
+    }
+    
     if (graph && initialGraph.current) {
       const same = JSON.stringify(graph) === JSON.stringify(initialGraph.current);
       setGraphModified(!same);
     }
-  }, [graph]);
+  }, [graph, text]);
 
   async function fetchGraph(nlText: string) {
     setIsLoading(true);

@@ -26,8 +26,8 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
   return (
     <div 
       className="
-        flex w-full max-w-[800px] mx-auto items-center gap-3 
-        p-3 
+        flex w-full max-w-[700px] mx-auto items-center gap-2 
+        p-2 
         bg-second rounded-lg 
         shadow-sm
         transition-shadow duration-200
@@ -40,8 +40,8 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
       <button
         className="
           flex items-center justify-center
-          w-8 h-8 
-          text-2xl font-bold 
+          w-6 h-6 
+          text-xl font-bold 
           text-third/70
           rounded-full
           transition-all duration-150
@@ -60,17 +60,17 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         type="text"
         className="
           flex-1 min-w-0
-          text-center text-base
+          text-center text-sm
           bg-main text-foreground 
-          px-3 py-2 
-          rounded-lg
-          border-4
+          px-2 py-1.5 
+          rounded-md
+          border-3
           transition-all duration-150
           focus:outline-none focus:ring-2 focus:ring-offset-1
         "
         style={{ 
           borderColor: fromColor,
-          boxShadow: `0 0 0 0 ${fromColor}` 
+          borderWidth: '3px'
         }}    
         value={textFrom}
         onChange={(e) => {
@@ -85,9 +85,9 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
       {/* Interaction type toggle */}
       <button
         className={`
-          px-4 py-2 min-w-[100px]
-          text-sm font-semibold text-white
-          rounded-lg
+          px-3 py-1.5 min-w-[85px]
+          text-xs font-semibold text-white
+          rounded-md
           transition-all duration-150
           ${isActivation 
             ? 'btn-activation' 
@@ -106,17 +106,17 @@ export default function GeneInteractionBubble({ interaction, geneColors, onToggl
         type="text"
         className="
           flex-1 min-w-0
-          text-center text-base
+          text-center text-sm
           bg-main text-foreground 
-          px-3 py-2 
-          rounded-lg
-          border-4
+          px-2 py-1.5 
+          rounded-md
+          border-3
           transition-all duration-150
           focus:outline-none focus:ring-2 focus:ring-offset-1
         "
         style={{ 
           borderColor: toColor,
-          boxShadow: `0 0 0 0 ${toColor}` 
+          borderWidth: '3px'
         }}    
         value={textTo}
         onChange={(e) => {

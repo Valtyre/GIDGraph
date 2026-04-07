@@ -28,7 +28,6 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
   
   const [geneList, nodes] = [graph.edges , graph.node]
   const uniqueID = useRef(geneList.length+1);
-  const interactionTemplate = {from: "", label: InteractionType.activation, to: "", id: uniqueID.current++}
 
   function flipInteraction(interaction: Interaction): void {
     const snl = [...geneList];
@@ -72,7 +71,13 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
   }
 
   function addInteraction(){
-      createInteraction(interactionTemplate)
+    const newInteraction = {
+      from: "", 
+      label: InteractionType.activation, 
+      to: "", 
+      id: uniqueID.current++
+    };
+    createInteraction(newInteraction);
   }
 
   function removeInteraction(i: Interaction): void {

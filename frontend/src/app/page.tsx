@@ -107,7 +107,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         {/* Input section: Natural Language + SNL Editor */}
         <section 
-          className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-2 h-[400px]"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-2 h-[450px]"
           aria-label="Input section"
         >
           <NatrualLanguageBox fun={setGraph} graph={graph} />
