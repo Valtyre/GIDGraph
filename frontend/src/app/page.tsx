@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────────────────────── page.tsx ── */
 /*  Main “Home” route for the front‑end:                                     
-      1. calls FastAPI /parse → receives a Graph                            
+      1. calls FastAPI /parse → receives a Graph                            
       2. derives logical formulas + pastel colours                          
       3. renders input boxes  |  network graph  |  formula bubbles          */
 /*  NOTE:  every edge coming from the backend is given a unique `id` here   */
@@ -40,7 +40,7 @@ export default function Home() {
   /* logical‑formulas derived from `graph` */
   const [lf, setLF] = useState<LF[]>([]);
 
-  /* gene → colour map shared by graph nodes & LF bubbles */
+  /* gene → colour map shared by graph nodes & LF bubbles */
   const [geneColors, setGeneColors] = useState<Record<string, string>>({});
 
   /* ───── Export handler  ───── */
@@ -66,7 +66,7 @@ export default function Home() {
 
 
 
-  /* ───────────── API call & unique‑id injection ───────────── */
+  /* ───────────── API call & unique‑id injection ───────────── */
   
   
 
@@ -94,36 +94,54 @@ export default function Home() {
 
   /* ────────────────────────── JSX ─────────────────────────── */
   return (
-    <main className="min-h-screen bg-main ">
-      {/* header bar */}
+    <div className="min-h-screen bg-main flex flex-col">
+      {/* Header */}
       <TopBar />
 
-      {/* input area: natural language + SNL editor */}
-      <section className="flex flex-row h-[400px]">
-        <NatrualLanguageBox fun={setGraph} graph={graph} />
-        <SNLBox 
-          graph={graph ?? emptyGraph} 
-          setGeneList={setGraph}
-          geneColors={geneColors}
-        />
-      </section>
-
-      {/* main content: graph (65 %)  |  logical formulas (35 %) */}
-      <section className="flex flex-row">
-        <div className="flex-[2]">
-          <GeneNetworkGraph graph={graph} geneColors={geneColors} />
-        </div>
-
-        <div className="flex-[1] overflow-y-auto max-h-[600px] p-4" tabIndex={0}>
-          <LogicalFormulasContainer
-            lf={lf}
-            setLF={setLF}
+      {/* Main content */}
+      <main className="flex-1 flex flex-col">
+        {/* Input section: Natural Language + SNL Editor */}
+        <section 
+          className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-2 min-h-[400px]"
+          aria-label="Input section"
+        >
+          <NatrualLanguageBox fun={setGraph} graph={graph} />
+          <SNLBox 
+            graph={graph ?? emptyGraph} 
+            setGeneList={setGraph}
             geneColors={geneColors}
-            onExport={exportGinml} // Pass the export function here
           />
-        </div>
-      </section>
-    </main>
+        </section>
+
+        {/* Divider */}
+        <div className="h-px bg-third/20 mx-6" role="separator" aria-hidden="true" />
+
+        {/* Output section: Graph + Logical Formulas */}
+        <section 
+          className="flex-1 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-0 lg:gap-2"
+          aria-label="Output section"
+        >
+          <GeneNetworkGraph graph={graph} geneColors={geneColors} />
+
+          <aside 
+            className="
+              overflow-y-auto max-h-[700px] 
+              custom-scrollbar
+              border-l border-third/10
+            " 
+            tabIndex={0}
+            aria-label="Logical formulas panel"
+          >
+            <LogicalFormulasContainer
+              lf={lf}
+              setLF={setLF}
+              geneColors={geneColors}
+              onExport={exportGinml}
+            />
+          </aside>
+        </section>
+      </main>
+    </div>
   );
 }
 /* ─────────────────────────────────────────────────────────────────────── */

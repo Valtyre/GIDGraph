@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { DataSet, Network, Node, Edge } from 'vis-network/standalone';
-import { Interaction, InteractionType } from './SNL/snlBox'; // Adjust the path if needed
+import { Interaction } from './SNL/snlBox';
 import { Infobox } from './infobox';
 
 interface VisNode extends Node {
@@ -59,7 +59,6 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
     const nodes: VisNode[] = Array.from(nodeIds).map(id => ({
       id,
       label: id,
-      /* pastel background, dark border */
       color: {
         background: geneColors[id] ?? '#6b7280',
         border: '#1f2937',
@@ -128,15 +127,32 @@ const GeneNetworkGraph: React.FC<GeneNetworkGraphProps> = ({ graph, geneColors }
   Here is the visual representation of the gene interactions presented in the Semi-Natural Language field. 
   The graph is interactive. 
   `
+
   return (
-    <div className="p-5 h-full w-full flex-1">
-      <h1 role="Heading" className="font-bold text-3xl text-third"> Regulatory Network <Infobox text={info}/> </h1>
+    <section 
+      className="p-5 lg:p-6 h-full w-full flex-1"
+      role="region"
+      aria-labelledby="graph-title"
+    >
+      <h2 id="graph-title" className="section-heading text-2xl lg:text-3xl">
+        Regulatory Network
+        <Infobox text={info}/>
+      </h2>
+      
       <div
         id="network"
         ref={networkRef}
-        className="w-full h-[600px] bg-second shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+        className="
+          w-full h-[600px] 
+          bg-second 
+          rounded-lg
+          shadow-lg
+          border border-third/10
+        "
+        role="img"
+        aria-label="Gene regulatory network visualization"
       />
-    </div>
+    </section>
   );
 };
 
