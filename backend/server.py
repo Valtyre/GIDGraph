@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from backend.exporter import router as exporter_router
+from backend.nlp.local_text_optimizer import optimize_text
 from backend.parser_manager import process_nl_text, process_snl_only
 
 app = FastAPI()
@@ -68,6 +69,16 @@ def parse_text(input_data: TextInput):
 @app.post("/api/update_snl")
 def update_snl(input_data: TextInput):
     return {"graph": process_snl_only(input_data.text)}
+
+
+@app.post("/api/optimize_nl")
+def optimize_nl(input_data: TextInput):
+    result = optimize_text(input_data.text)
+    return {
+        "text": result.text,
+        "optimized": result.optimized,
+        "fallback": result.fallback,
+    }
 
 
 @app.get("/")

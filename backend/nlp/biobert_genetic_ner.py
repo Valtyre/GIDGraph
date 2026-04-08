@@ -1,16 +1,21 @@
-import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
 
-# Load model and tokenizer
-model_name = "alvaroalon2/biobert_genetic_ner"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForTokenClassification.from_pretrained(model_name)
+MODEL_NAME = "alvaroalon2/biobert_genetic_ner"
+_ner_pipeline = None
 
-# Create NER pipeline
-ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer)
+
+def get_ner_pipeline():
+    global _ner_pipeline
+
+    if _ner_pipeline is None:
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+        model = AutoModelForTokenClassification.from_pretrained(MODEL_NAME)
+        _ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer)
+
+    return _ner_pipeline
 
 def extract_genes(text):
-    ner_results = ner_pipeline(text)
+    ner_results = get_ner_pipeline()(text)
 
     excluded_words = {"genes", "gene", "protein", "proteins", "loci", "genomic", "response", "elements", "mutant",}
     merged_genes: list[str] = []

@@ -4,6 +4,7 @@
 /SpaCyEnv
 .env
 .env.local
+.env.backend.local
 .venv
 #/backend/graphOutputs
 
@@ -24,3 +25,5 @@
 
 /nginx/logs/*         
 !/nginx/logs/.gitkeep 
+
+.vscode/

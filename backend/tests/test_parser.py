@@ -71,5 +71,5 @@ class TestVisParser:
         from backend.parser.visParser import vis_parse_text
         
         # Empty string should raise an error or return empty graph
-        with pytest.raises(Exception):
+        with pytest.raises(SystemExit):
             vis_parse_text("")

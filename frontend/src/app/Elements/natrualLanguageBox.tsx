@@ -5,7 +5,8 @@ import { buildApiUrl } from "../../lib/apiConfig";
 
 export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetStateAction<Graph | null>>, graph: Graph | null }) {
   const [text, setText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const [graphModified, setGraphModified] = useState(false);
   const [selectedExample, setSelectedExample] = useState<string>("");
 
@@ -36,7 +37,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
   }, [graph, text]);
 
   async function fetchGraph(nlText: string) {
-    setIsLoading(true);
+    setIsParsing(true);
     document.body.style.cursor = "wait";
 
     try {
@@ -59,7 +60,30 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
       const reason = err.message || err.toString();
       alert(`Failed to fetch graph data: ${reason}. Please try again.`);
     } finally {
-      setIsLoading(false);
+      setIsParsing(false);
+      document.body.style.cursor = "default";
+    }
+  }
+
+  async function optimizeText() {
+    setIsOptimizing(true);
+    document.body.style.cursor = "wait";
+
+    try {
+      const res = await fetch(buildApiUrl("/api/optimize_nl"), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+
+      const data: { text: string; optimized: boolean; fallback: boolean } = await res.json();
+      setText(data.text);
+    } catch (err: any) {
+      console.error('optimize API error:', err);
+      const reason = err.message || err.toString();
+      alert(`Failed to optimize text: ${reason}. The original text has been kept.`);
+    } finally {
+      setIsOptimizing(false);
       document.body.style.cursor = "default";
     }
   }
@@ -120,44 +144,71 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
           transition-all duration-200
           hover:border-third/50
           focus:border-third focus:ring-2 focus:ring-third/20 focus:outline-none
-          ${isLoading ? "cursor-wait opacity-75" : ""}
+          ${(isParsing || isOptimizing) ? "cursor-wait opacity-75" : ""}
         `}
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Enter gene interaction descriptions here..."
         aria-describedby={graphModified ? "graph-warning" : undefined}
-        disabled={isLoading}
+        disabled={isParsing || isOptimizing}
       />
 
       {/* Actions row */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center mt-4">
-        {/* Convert button */}
-        <button
-          onClick={() => {
-            fetchGraph(text);
-          }}
-          disabled={isLoading || !text.trim()}
-          className={`
-            btn btn-primary
-            px-5 py-2.5
-            text-sm sm:text-base
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${isLoading ? "cursor-wait" : ""}
-          `}
-          aria-busy={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              Processing...
-            </>
-          ) : (
-            "Convert to Semi-Natural Language"
-          )}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={optimizeText}
+            disabled={isParsing || isOptimizing || !text.trim()}
+            className={`
+              btn
+              px-5 py-2.5
+              text-sm sm:text-base
+              border border-third/30
+              disabled:opacity-50 disabled:cursor-not-allowed
+              ${(isParsing || isOptimizing) ? "cursor-wait" : ""}
+            `}
+            aria-busy={isOptimizing}
+          >
+            {isOptimizing ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Optimizing...
+              </>
+            ) : (
+              "Optimize for Parser"
+            )}
+          </button>
+
+          <button
+            onClick={() => {
+              fetchGraph(text);
+            }}
+            disabled={isParsing || isOptimizing || !text.trim()}
+            className={`
+              btn btn-primary
+              px-5 py-2.5
+              text-sm sm:text-base
+              disabled:opacity-50 disabled:cursor-not-allowed
+              ${(isParsing || isOptimizing) ? "cursor-wait" : ""}
+            `}
+            aria-busy={isParsing}
+          >
+            {isParsing ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Processing...
+              </>
+            ) : (
+              "Convert to Semi-Natural Language"
+            )}
+          </button>
+        </div>
 
         {/* Example selector */}
         <div className="flex items-center gap-3">
@@ -171,7 +222,7 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
             id="example-select"
             value={selectedExample}
             onChange={handleExampleChange}
-            disabled={isLoading}
+            disabled={isParsing || isOptimizing}
             className="
               px-3 py-2
               bg-third text-white 

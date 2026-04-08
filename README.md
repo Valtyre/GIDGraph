@@ -10,16 +10,42 @@ The website can be found at [gidgraph.com](https://www.gidgraph.com).
 
 Use two terminals: one for the backend API and one for the frontend website.
 
-### 1. Start the backend API
+### 1. Configure and start the backend API
 
-Run this from the repo root:
+Copy the example backend env file and adjust values if needed:
 
-```powershell
-cd c:\Users\chrwa\Documents\GitHub\GIDGraph
-python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000 --reload
+```bash
+cp .env.backend.example .env.backend.local
+```
+
+The default local Ollama configuration is:
+
+```bash
+LOCAL_LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2:3b
+OLLAMA_TIMEOUT_SECONDS=20
+OPTIMIZER_LOG_REJECTIONS=false
+```
+
+Then start the backend from the repo root:
+
+```bash
+bash scripts/run-backend.sh
 ```
 
 The backend will be available at `http://localhost:8000`.
+
+For debugging only, you can still launch it manually with shell exports:
+
+```bash
+export LOCAL_LLM_PROVIDER=ollama
+export OLLAMA_BASE_URL=http://localhost:11434
+export OLLAMA_MODEL=llama3.2:3b
+export OLLAMA_TIMEOUT_SECONDS=20
+export OPTIMIZER_LOG_REJECTIONS=true
+python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000 --reload
+```
 
 ### 2. Choose which backend the frontend should use
 
