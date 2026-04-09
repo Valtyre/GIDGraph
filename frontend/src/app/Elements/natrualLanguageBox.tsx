@@ -47,14 +47,20 @@ export default function NatrualLanguageBox({ fun, graph }: { fun: Dispatch<SetSt
         body: JSON.stringify({ text: nlText }),
       });
 
-      const data: { graph: Graph } = await res.json();
+      const data = await res.json();
+      if (!res.ok) {
+        const message = data?.detail?.message || data?.message || 'Unable to parse the provided text.';
+        throw new Error(message);
+      }
+
+      const graphData: Graph = data.graph;
 
       let nextId = 0;
-      const withIds = data.graph.edges.map(edge =>
+      const withIds = graphData.edges.map(edge =>
         edge.id === undefined ? { ...edge, id: nextId++ } : edge
       );
 
-      fun({ node: data.graph.node, edges: withIds });
+      fun({ node: graphData.node ?? "", edges: withIds });
     } catch (err: any) {
       console.error('parse API error:', err);
       const reason = err.message || err.toString();

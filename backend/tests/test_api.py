@@ -24,21 +24,57 @@ class TestParseEndpoint:
         assert "nodes" in data["graph"]
         assert "edges" in data["graph"]
 
-    def test_parse_empty_text(self, api_client, monkeypatch):
-        """Test parsing empty text returns empty result."""
+    def test_parse_empty_text_returns_validation_error(self, api_client, monkeypatch):
+        """Test parsing empty text surfaces a structured validation error."""
+        from backend.parser.visParser import ParserError
+
         monkeypatch.setattr(
             "backend.server.process_nl_text",
-            lambda text: ("", {"nodes": [], "edges": []}),
+            lambda text: (_ for _ in ()).throw(
+                ParserError(
+                    error="NO_VALID_RELATIONS",
+                    message="No supported gene relations could be extracted from the provided text.",
+                    original_input=text,
+                    parser_input="",
+                )
+            ),
         )
 
         response = api_client.post(
             "/api/parse",
             json={"text": ""}
         )
-        assert response.status_code == 200
+        assert response.status_code == 422
         data = response.json()
-        assert "graph" in data
-        assert data["graph"] == {"nodes": [], "edges": []}
+        assert data["detail"]["error"] == "NO_VALID_RELATIONS"
+        assert "No supported gene relations" in data["detail"]["message"]
+
+    def test_parse_returns_partial_graph_when_valid_relations_survive(self, api_client, monkeypatch):
+        """Test parsing returns success when at least one valid relation remains."""
+        monkeypatch.setattr(
+            "backend.server.process_nl_text",
+            lambda text: (
+                "GATA4 activates HAND2. SCR binds SCR.",
+                {
+                    "nodes": [
+                        {"id": "GATA4", "label": "GATA4"},
+                        {"id": "HAND2", "label": "HAND2"},
+                        {"id": "SCR", "label": "SCR"},
+                    ],
+                    "edges": [
+                        {"from": "GATA4", "to": "HAND2", "label": "activation"},
+                        {"from": "SCR", "to": "SCR", "label": "binding"},
+                    ],
+                },
+            ),
+        )
+
+        response = api_client.post(
+            "/api/parse",
+            json={"text": "mixed input"}
+        )
+        assert response.status_code == 200
+        assert len(response.json()["graph"]["edges"]) == 2
 
 
 class TestUpdateSNLEndpoint:

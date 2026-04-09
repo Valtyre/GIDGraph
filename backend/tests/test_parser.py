@@ -68,8 +68,9 @@ class TestVisParser:
 
     def test_parse_empty_string(self):
         """Test parsing empty string."""
-        from backend.parser.visParser import vis_parse_text
+        from backend.parser.visParser import ParserError, vis_parse_text
         
-        # Empty string should raise an error or return empty graph
-        with pytest.raises(SystemExit):
+        with pytest.raises(ParserError) as exc_info:
             vis_parse_text("")
+
+        assert exc_info.value.error == "NO_VALID_RELATIONS"

@@ -65,7 +65,8 @@ TRAILING_CONTEXT_TOKENS = {
 GENERIC_INVALID_TOKENS = {
     "knockout", "mutant", "signalling", "signaling", "expression", "promoter", "loci",
     "genes", "gene", "transcription", "cells", "cell", "ventricles", "ventricle",
-    "proteins", "protein", "elements", "regions", "sites",
+    "proteins", "protein", "elements", "region", "regions", "root", "roots",
+    "sites", "activity", "auxin",
 }
 
 SYSTEM_PROMPT = """You convert biological prose into short parser-friendly relation statements.
@@ -97,6 +98,13 @@ class OptimizationResult:
     text: str
     optimized: bool
     fallback: bool
+
+
+@dataclass(frozen=True)
+class ParserNormalizationResult:
+    text: str
+    relations: list[str]
+    dropped: list[str]
 
 
 def optimize_text(text: str) -> OptimizationResult:
@@ -143,6 +151,16 @@ def optimize_text(text: str) -> OptimizationResult:
         _log_rejection(cleaned_input, raw_output, sanitized_output, "; ".join(dropped_reasons))
 
     return OptimizationResult(text=" ".join(merged), optimized=True, fallback=False)
+
+
+def normalize_parser_text(text: str) -> ParserNormalizationResult:
+    sanitized_input = _sanitize_text(text)
+    relations, dropped = _extract_valid_relations(sanitized_input)
+    return ParserNormalizationResult(
+        text=" ".join(relations),
+        relations=relations,
+        dropped=dropped,
+    )
 
 
 def _request_ollama(base_url: str, model: str, text: str, timeout: float) -> str:

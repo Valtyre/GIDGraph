@@ -2,12 +2,14 @@
 import os
 
 from fastapi import FastAPI
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from backend.exporter import router as exporter_router
 from backend.nlp.local_text_optimizer import optimize_text
 from backend.parser_manager import process_nl_text, process_snl_only
+from backend.parser.visParser import ParserError
 
 app = FastAPI()
 
@@ -51,6 +53,22 @@ class TextInput(BaseModel):
     text: str
 
 
+def _raise_http_parse_error(exc: ParserError) -> None:
+    raise HTTPException(
+        status_code=422,
+        detail={
+            "error": exc.error,
+            "message": exc.message,
+            "details": {
+                "original_input": exc.original_input,
+                "parser_input": exc.parser_input,
+                "position": exc.position,
+                "context": exc.context,
+            },
+        },
+    )
+
+
 @app.post("/api/parse")
 def parse_text(input_data: TextInput):
     """
@@ -58,17 +76,22 @@ def parse_text(input_data: TextInput):
     Calls process_nl_text(...) to do the NLP + parsing,
     and returns the resulting SNL + graph data.
     """
-    nlp_output, graph_dict = process_nl_text(input_data.text)
+    try:
+        _, graph_dict = process_nl_text(input_data.text)
+    except ParserError as exc:
+        _raise_http_parse_error(exc)
 
     return {
-        # "snl": nlp_output,
         "graph": graph_dict,
     }
 
 
 @app.post("/api/update_snl")
 def update_snl(input_data: TextInput):
-    return {"graph": process_snl_only(input_data.text)}
+    try:
+        return {"graph": process_snl_only(input_data.text)}
+    except ParserError as exc:
+        _raise_http_parse_error(exc)
 
 
 @app.post("/api/optimize_nl")
