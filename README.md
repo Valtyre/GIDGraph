@@ -6,6 +6,10 @@ Models in Systems Biology". See thesis for user guide.
 
 The website can be found at [gidgraph.com](https://www.gidgraph.com).
 
+GIDGraph is source-available for non-commercial use only. Commercial use is
+not permitted without prior written permission from the authors. See
+[`LICENSE`](LICENSE) for the full terms.
+
 ## Run locally
 
 Use two terminals: one for the backend API and one for the frontend website.
@@ -89,4 +93,4 @@ The frontend will be available at `http://localhost:3000`.
 
 Open `http://localhost:3000` in your browser.
 
-Created by Christian Wantzin & Valtyr Ellidi Einarsson
+Created by Christian Wantzin & Valtýr Ellidi Einarsson
