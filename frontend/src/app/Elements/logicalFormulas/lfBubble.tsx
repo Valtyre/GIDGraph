@@ -8,74 +8,66 @@ type LogicalFormulasBubbleProps = {
   onToggle: ToggleFn;
 };
 
-export default function LogicalFormulasBubble({lf, geneColors, onToggle}: LogicalFormulasBubbleProps) {
-  const geneColor = geneColors[lf.targetGene] ?? "#9ca3af"; 
+export default function LogicalFormulasBubble({
+  lf,
+  geneColors,
+  onToggle,
+}: LogicalFormulasBubbleProps) {
+  const geneColor = geneColors[lf.targetGene] ?? "#b9c0cb";
 
   return (
     <div
-      className="
-        bg-second text-foreground 
-        px-4 py-3 
-        rounded-lg 
-        shadow-sm
-        border-l-4
-        transition-shadow duration-200
-        hover:shadow-md
-      "
-      style={{ borderLeftColor: geneColor }}
+      className="rounded-[1.35rem] border border-[color:var(--color-line)] bg-[rgba(255,255,255,0.82)] p-4 shadow-[0_10px_28px_rgba(27,38,54,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(27,38,54,0.12)]"
+      style={{ boxShadow: `inset 3px 0 0 ${geneColor}, 0 10px 28px rgba(27,38,54,0.08)` }}
       role="listitem"
     >
-      <span className="font-bold text-lg">{lf.targetGene}</span>
-      <span className="text-gray-500 mx-2">=</span>
-      
-      <span className="inline-flex flex-wrap items-center gap-1">
-        {lf.incomingGenes.map((ig, idx) => {
-          const hasNext = idx < lf.incomingGenes.length - 1;
-          const badgeColor = geneColors[ig.gene] ?? "#d1d5db";
+      <div className="mb-3 flex items-center gap-3">
+        <span className="inline-flex rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[color:var(--color-accent-strong)]" style={{ backgroundColor: `${geneColor}55` }}>
+          Target
+        </span>
+        <span className="font-[family:var(--font-display)] text-3xl leading-none text-foreground">
+          {lf.targetGene}
+        </span>
+      </div>
 
-          return (
-            <span key={idx} className="inline-flex items-center">
-              {/* Gene badge */}
-              <span
-                className="
-                  inline-flex items-center
-                  rounded-full px-2.5 py-1 
-                  text-xs font-semibold 
-                  text-gray-800
-                  transition-transform duration-150
-                  hover:scale-105
-                "
-                style={{ backgroundColor: badgeColor }}
-              >
-                {ig.label ? "" : <span className="mr-0.5">¬</span>}
-                {ig.gene}
-              </span>
+      <div className="rounded-[1.15rem] border border-[color:var(--color-line)] bg-[rgba(246,242,234,0.7)] px-3 py-3 text-sm text-[color:var(--color-ink-soft)]">
+        <div className="mb-2 text-[0.72rem] font-extrabold uppercase tracking-[0.14em] text-[color:var(--color-accent-strong)]">
+          Formula
+        </div>
+        <span className="inline-flex flex-wrap items-center gap-2">
+          {lf.incomingGenes.map((ig, idx) => {
+            const hasNext = idx < lf.incomingGenes.length - 1;
+            const badgeColor = geneColors[ig.gene] ?? "#d7dce4";
 
-              {/* AND/OR toggle button */}
-              {hasNext && (
-                <button
-                  onClick={() => onToggle(lf.targetGene, idx)}
-                  className={`
-                    mx-2 px-3 py-1 
-                    rounded-md 
-                    text-xs font-bold
-                    uppercase tracking-wide
-                    transition-all duration-150
-                    ${ig.truthValue 
-                      ? "bg-third/20 text-third hover:bg-third/30" 
-                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                    }
-                  `}
-                  aria-label={`Toggle connector, currently ${ig.truthValue ? 'AND' : 'OR'}`}
-                  title="Click to toggle between AND and OR"
+            return (
+              <span key={idx} className="inline-flex items-center">
+                <span
+                  className="inline-flex items-center rounded-full border border-white/70 px-3 py-1.5 text-xs font-bold text-[color:var(--color-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]"
+                  style={{ backgroundColor: badgeColor }}
                 >
-                  {ig.truthValue ? "AND" : "OR"}
-                </button>
-              )}
-            </span>
-          );
-        })}
-      </span>
+                  {!ig.label && <span className="mr-1 text-[color:var(--color-danger)]">NOT</span>}
+                  {ig.gene}
+                </span>
+
+                {hasNext && (
+                  <button
+                    onClick={() => onToggle(lf.targetGene, idx)}
+                    className={`mx-2 rounded-full px-3 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] transition-all duration-150 ${
+                      ig.truthValue
+                        ? "bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent-strong)]"
+                        : "bg-[rgba(36,46,64,0.08)] text-[color:var(--color-ink-soft)]"
+                    }`}
+                    aria-label={`Toggle connector, currently ${ig.truthValue ? 'AND' : 'OR'}`}
+                    title="Click to toggle between AND and OR"
+                  >
+                    {ig.truthValue ? "AND" : "OR"}
+                  </button>
+                )}
+              </span>
+            );
+          })}
+        </span>
+      </div>
     </div>
   );
 }

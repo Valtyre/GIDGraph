@@ -1,27 +1,33 @@
-export default function ExportButton({ onExport, isLoading = false }: { onExport: () => void; isLoading?: boolean }) {
+export default function ExportButton({
+  onExport,
+  isLoading = false,
+}: {
+  onExport: () => void;
+  isLoading?: boolean;
+}) {
   return (
-    <div className="mt-4 text-center">
+    <div className="mt-4 rounded-[1.4rem] border border-[color:rgba(195,155,93,0.28)] bg-[linear-gradient(135deg,rgba(195,155,93,0.16)_0%,rgba(255,255,255,0.9)_100%)] p-4">
       <button
         onClick={onExport}
         disabled={isLoading}
-        className="btn btn-export px-5 py-2.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn btn-export w-full justify-center disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Export logical formulas to GINML format"
         aria-busy={isLoading}
       >
         {isLoading ? (
           <>
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            Exporting...
+            Preparing export
           </>
         ) : (
           <>
-            <svg 
-              className="w-4 h-4" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
               aria-hidden="true"
             >

@@ -1,85 +1,58 @@
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   GIDGraph Design System
-   
-   Extendable design tokens organized by purpose.
-   To customize the theme, modify the CSS custom properties below.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
 :root {
-  /* ─── Core Colors ─────────────────────────────────────────────────────────
-     Primary palette - modify these to change the overall theme */
-  --color-primary-50: #EBF4FF;
-  --color-primary-100: #D6E8FF;
-  --color-primary-200: #A8D0FF;
-  --color-primary-500: #3567A4;
-  --color-primary-600: #2B5587;
-  --color-primary-700: #1D559A;
-  --color-primary-800: #164172;
+  color-scheme: light;
 
-  /* ─── Semantic Colors ─────────────────────────────────────────────────────
-     Use these for consistent meaning across components */
-  --color-surface: #F2F9FF;
-  --color-surface-alt: #CED9E7;
-  --color-background: #F2F9FF;
-  --color-foreground: #1a1a1a;
-  --color-muted: #6b7280;
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-manrope);
+  --font-mono: var(--font-geist-mono);
 
-  /* ─── Interaction Colors ──────────────────────────────────────────────────
-     For activation/inhibition states in gene interactions */
-  --color-activation: #22c55e;
-  --color-activation-hover: #16a34a;
-  --color-inhibition: #ef4444;
-  --color-inhibition-hover: #dc2626;
+  --color-bg: #f6f2ea;
+  --color-bg-soft: #fbf8f2;
+  --color-bg-muted: #efe8dc;
+  --color-surface: rgba(255, 252, 247, 0.86);
+  --color-surface-strong: rgba(255, 251, 245, 0.96);
+  --color-surface-tint: rgba(243, 237, 228, 0.82);
+  --color-line: rgba(36, 46, 64, 0.12);
+  --color-line-strong: rgba(36, 46, 64, 0.2);
+  --color-ink: #1e2a3a;
+  --color-ink-soft: #516074;
+  --color-ink-muted: #758295;
+  --color-accent: #1f5f72;
+  --color-accent-strong: #174b5a;
+  --color-accent-soft: rgba(31, 95, 114, 0.12);
+  --color-accent-glow: rgba(61, 142, 166, 0.2);
+  --color-gold: #c39b5d;
+  --color-success: #2f7d60;
+  --color-success-soft: rgba(47, 125, 96, 0.12);
+  --color-danger: #a44a4f;
+  --color-danger-soft: rgba(164, 74, 79, 0.12);
+  --color-warning: #996f2d;
+  --color-warning-soft: rgba(153, 111, 45, 0.13);
+  --color-white: #fffdf9;
 
-  /* ─── Feedback Colors ─────────────────────────────────────────────────────
-     For warnings, errors, success states */
-  --color-warning: #f59e0b;
-  --color-warning-bg: #fef3c7;
-  --color-error: #dc2626;
-  --color-success: #16a34a;
+  --shadow-sm: 0 8px 24px rgba(32, 44, 61, 0.06);
+  --shadow-md: 0 18px 50px rgba(28, 40, 58, 0.1);
+  --shadow-lg: 0 28px 90px rgba(22, 36, 54, 0.16);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
-  /* ─── Export/Action Colors ────────────────────────────────────────────────
-     Special action buttons */
-  --color-export: #529CCB;
-  --color-export-hover: #468BB3;
-  --color-secondary: #6b7280;
-  --color-secondary-hover: #4b5563;
+  --radius-xs: 0.75rem;
+  --radius-sm: 1rem;
+  --radius-md: 1.35rem;
+  --radius-lg: 1.75rem;
+  --radius-xl: 2.5rem;
+  --radius-pill: 999px;
 
-  /* ─── Spacing Scale ───────────────────────────────────────────────────────
-     Consistent spacing (based on 4px grid) */
-  --space-1: 0.25rem;  /* 4px */
-  --space-2: 0.5rem;   /* 8px */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-5: 1.25rem;  /* 20px */
-  --space-6: 1.5rem;   /* 24px */
-  --space-8: 2rem;     /* 32px */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
 
-  /* ─── Border Radius ───────────────────────────────────────────────────────
-     Consistent rounding */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-full: 9999px;
-
-  /* ─── Shadows ─────────────────────────────────────────────────────────────
-     Depth and elevation */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
-
-  /* ─── Transitions ─────────────────────────────────────────────────────────
-     Smooth animations */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 300ms ease;
-
-  /* ─── Typography ──────────────────────────────────────────────────────────
-     Font sizing */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -87,172 +60,367 @@
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
   --text-3xl: 1.875rem;
+  --text-4xl: 2.5rem;
 
-  /* ─── Focus Ring ──────────────────────────────────────────────────────────
-     Accessible focus states */
-  --focus-ring: 0 0 0 2px var(--color-primary-100), 0 0 0 4px var(--color-primary-500);
+  --transition-fast: 160ms ease;
+  --transition-base: 220ms ease;
+  --transition-slow: 320ms ease;
+
+  --focus-ring: 0 0 0 2px rgba(255, 252, 247, 0.9), 0 0 0 4px rgba(31, 95, 114, 0.45);
 }
 
-/* ─── Tailwind Theme Integration ────────────────────────────────────────────
-   Maps CSS variables to Tailwind classes */
 @theme inline {
-  --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-ink);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
 
-  /* Legacy mappings for backward compatibility */
-  --color-main: var(--color-surface-alt);
+  --color-main: var(--color-bg);
   --color-second: var(--color-surface);
-  --color-third: var(--color-primary-500);
-  --color-off: var(--color-surface);
-  --color-dark: var(--color-primary-700);
-
-  /* New semantic mappings */
-  --color-primary: var(--color-primary-500);
-  --color-primary-hover: var(--color-primary-700);
-  --color-activate: var(--color-activation);
-  --color-inhibit: var(--color-inhibition);
+  --color-third: var(--color-accent);
+  --color-off: var(--color-bg-soft);
+  --color-dark: var(--color-accent-strong);
+  --color-primary: var(--color-accent);
+  --color-primary-hover: var(--color-accent-strong);
+  --color-activate: var(--color-success);
+  --color-inhibit: var(--color-danger);
 }
 
-/* ─── Dark Mode (optional future extension) ─────────────────────────────────
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #0a0a0a;
-    --color-foreground: #ededed;
-    --color-surface: #1a1a1a;
-    --color-surface-alt: #2a2a2a;
-  }
+* {
+  box-sizing: border-box;
 }
-*/
 
-/* ─── Base Styles ───────────────────────────────────────────────────────────*/
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(195, 155, 93, 0.12), transparent 34%),
+    radial-gradient(circle at top right, rgba(31, 95, 114, 0.12), transparent 30%),
+    linear-gradient(180deg, #f8f4ed 0%, #f2ece1 100%);
+}
+
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  line-height: 1.5;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  background: transparent;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
-/* ─── Focus Visible Utility ─────────────────────────────────────────────────
-   Accessible focus states for keyboard navigation */
+body::selection {
+  background: rgba(31, 95, 114, 0.18);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
 *:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
 
-/* ─── Button Base Styles ────────────────────────────────────────────────────
-   Reusable button foundation */
+.app-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  pointer-events: none;
+  filter: blur(10px);
+}
+
+.app-shell::before {
+  top: 5rem;
+  left: -6rem;
+  width: 16rem;
+  height: 16rem;
+  background: radial-gradient(circle, rgba(195, 155, 93, 0.16), transparent 68%);
+}
+
+.app-shell::after {
+  right: -4rem;
+  bottom: 10rem;
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle, rgba(31, 95, 114, 0.18), transparent 70%);
+}
+
+.glass-panel {
+  background: linear-gradient(180deg, var(--color-surface-strong) 0%, var(--color-surface) 100%);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+  backdrop-filter: blur(16px);
+}
+
+.workspace-panel {
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base),
+    background-color var(--transition-base);
+}
+
+@media (min-width: 1024px) {
+  .workspace-panel {
+    padding: 1.5rem;
+  }
+}
+
+.workspace-panel:hover,
+.workspace-panel:focus-within {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  border-color: var(--color-line-strong);
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.panel-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.85rem, 3vw, 2.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
+.panel-subtitle {
+  max-width: 36rem;
+  margin-top: 0.45rem;
+  color: var(--color-ink-soft);
+  font-size: 0.98rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(31, 95, 114, 0.14);
+  color: var(--color-accent-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.workspace-input,
+.workspace-select {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  background: rgba(255, 253, 249, 0.92);
+  color: var(--color-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.workspace-input::placeholder {
+  color: var(--color-ink-muted);
+}
+
+.workspace-input:hover,
+.workspace-select:hover {
+  border-color: var(--color-line-strong);
+}
+
+.workspace-input:focus,
+.workspace-select:focus {
+  border-color: rgba(31, 95, 114, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 0 4px rgba(31, 95, 114, 0.12);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  font-weight: 600;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  gap: 0.65rem;
+  min-height: 2.9rem;
+  padding: 0.8rem 1.25rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
   cursor: pointer;
-  border: none;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
 .btn-primary {
-  background-color: var(--color-primary-500);
-  color: white;
+  color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
+  box-shadow: 0 14px 30px rgba(31, 95, 114, 0.24);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-700);
+  box-shadow: 0 18px 40px rgba(31, 95, 114, 0.32);
 }
 
 .btn-secondary {
-  background-color: var(--color-secondary);
-  color: white;
+  color: var(--color-ink);
+  background: rgba(255, 253, 249, 0.88);
+  border-color: var(--color-line);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-secondary-hover);
+  border-color: rgba(31, 95, 114, 0.28);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .btn-activation {
-  background-color: var(--color-activation);
-  color: white;
-}
-
-.btn-activation:hover:not(:disabled) {
-  background-color: var(--color-activation-hover);
+  color: #effbf5;
+  background: linear-gradient(135deg, #41926f 0%, #2f7d60 100%);
+  box-shadow: 0 10px 26px rgba(47, 125, 96, 0.2);
 }
 
 .btn-inhibition {
-  background-color: var(--color-inhibition);
-  color: white;
-}
-
-.btn-inhibition:hover:not(:disabled) {
-  background-color: var(--color-inhibition-hover);
+  color: #fff6f7;
+  background: linear-gradient(135deg, #b4585e 0%, #a44a4f 100%);
+  box-shadow: 0 10px 26px rgba(164, 74, 79, 0.2);
 }
 
 .btn-export {
-  background-color: var(--color-export);
-  color: white;
+  color: var(--color-ink);
+  background: linear-gradient(135deg, rgba(195, 155, 93, 0.24) 0%, rgba(255, 255, 255, 0.92) 100%);
+  border-color: rgba(195, 155, 93, 0.32);
+  box-shadow: var(--shadow-sm);
 }
 
-.btn-export:hover:not(:disabled) {
-  background-color: var(--color-export-hover);
-}
-
-/* ─── Card/Panel Styles ─────────────────────────────────────────────────────
-   Reusable container patterns */
-.card {
-  background-color: var(--color-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-}
-
-.card-bordered {
-  border: 2px solid var(--color-primary-500);
-}
-
-/* ─── Section Heading ───────────────────────────────────────────────────────
-   Consistent heading styles */
-.section-heading {
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  color: var(--color-primary-500);
-  margin-bottom: var(--space-4);
-  display: flex;
+.status-pill {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-line);
 }
 
-/* ─── Scrollbar Styling ─────────────────────────────────────────────────────
-   Subtle custom scrollbars */
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(31, 95, 114, 0.12);
+}
+
+.empty-state {
+  display: flex;
+  min-height: 12rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  border-radius: calc(var(--radius-lg) - 0.25rem);
+  border: 1px dashed rgba(36, 46, 64, 0.14);
+  background: linear-gradient(180deg, rgba(255, 253, 249, 0.7) 0%, rgba(243, 237, 228, 0.65) 100%);
+  color: var(--color-ink-soft);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31, 95, 114, 0.45) transparent;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: var(--color-surface-alt);
-  border-radius: var(--radius-full);
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--color-primary-500);
-  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, rgba(31, 95, 114, 0.45) 0%, rgba(31, 95, 114, 0.24) 100%);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-700);
+.animate-enter {
+  animation: fadeUp 500ms ease both;
 }
 
+.animate-delay-1 {
+  animation-delay: 80ms;
+}
 
+.animate-delay-2 {
+  animation-delay: 150ms;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

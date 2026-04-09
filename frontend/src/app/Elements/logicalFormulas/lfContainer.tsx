@@ -1,12 +1,11 @@
 import { Infobox } from "../infobox";
 import LogicalFormulasBubble from "./lfBubble";
-import ExportButton from "./ExportButton"; 
+import ExportButton from "./ExportButton";
 
-/* ----- types (unchanged) ----- */
 export type incomingGene = {
   gene: string;
-  label: boolean;        // activation / inhibition
-  truthValue: boolean;   // true = AND, false = OR
+  label: boolean;
+  truthValue: boolean;
 };
 
 export type LogicalFormula = {
@@ -20,10 +19,17 @@ type LogicalFormulasContainerProps = {
   geneColors: Record<string, string>;
   onExport: () => void;
   isExporting?: boolean;
+  hasGraph?: boolean;
 };
 
-export default function LogicalFormulasContainer({lf, setLF, geneColors, onExport, isExporting = false}: LogicalFormulasContainerProps) {
-  /* toggle function passed down to each bubble */
+export default function LogicalFormulasContainer({
+  lf,
+  setLF,
+  geneColors,
+  onExport,
+  isExporting = false,
+  hasGraph = false,
+}: LogicalFormulasContainerProps) {
   const toggleConnector = (targetGene: string, idx: number) => {
     setLF((prev) =>
       prev.map((formula) =>
@@ -39,38 +45,54 @@ export default function LogicalFormulasContainer({lf, setLF, geneColors, onExpor
     );
   };
 
-  const info = `
-  In this field, the logical formulas derived from the gene interactions is shown. Click the 'AND' and 'OR' buttons to switch between.
-  The user can export these logical formulas to GINML, for use in GinSim.`;
+  const info = "Logical formulas are derived from the current interaction set.";
 
   return (
     <section
-      className="flex flex-col gap-4 p-4 lg:p-5"
+      className="glass-panel workspace-panel flex h-[640px] flex-col"
       role="region"
       aria-labelledby="lf-title"
     >
-      <h2 id="lf-title" className="section-heading text-2xl lg:text-3xl">
-        Logical Formulas
-        <Infobox text={info} />
-      </h2>
+      <div className="panel-header">
+        <div>
+          <span className="eyebrow">Step 4</span>
+          <div className="section-heading mt-4">
+            <div>
+              <h2 id="lf-title" className="panel-title">
+                Logical formulas
+              </h2>
+              <p className="panel-subtitle">
+                Review and export formulas.
+              </p>
+            </div>
+            <Infobox text={info} />
+          </div>
+        </div>
+      </div>
 
       {lf.length === 0 ? (
-        <div className="text-center text-gray-500 py-8 bg-off/50 rounded-lg">
-          <svg 
-            className="w-12 h-12 mx-auto mb-3 text-gray-300" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p>No logical formulas yet</p>
-          <p className="text-sm mt-1">Convert text above to generate formulas</p>
+        <div className="empty-state flex-1">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[color:var(--color-line)] bg-white/85">
+            <svg
+              className="h-7 w-7 text-[color:var(--color-accent-strong)]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <p className="text-lg font-semibold text-foreground">No formulas yet.</p>
+          <p className="max-w-sm text-sm">
+            {hasGraph
+              ? "Add or adjust interactions to continue."
+              : "Generate a graph to derive formulas."}
+          </p>
         </div>
       ) : (
         <>
-          <div className="flex flex-col gap-3" role="list" aria-label="Logical formulas">
+          <div className="custom-scrollbar flex h-full flex-1 flex-col gap-3 overflow-y-auto pr-1" role="list" aria-label="Logical formulas">
             {lf.map((formula, idx) => (
               <LogicalFormulasBubble
                 key={idx}

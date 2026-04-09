@@ -1,43 +1,18 @@
 export function Infobox({ text }: { text: string }) {
   return (
-    <div className="relative group inline-flex items-center ml-2" tabIndex={0}>
-      {/* Info icon - styled circle with "i" */}
-      <span 
-        className="
-          inline-flex items-center justify-center
-          w-5 h-5 rounded-full
-          bg-third/20 text-third
-          text-xs font-bold
-          cursor-help
-          transition-colors duration-150
-          group-hover:bg-third group-hover:text-white
-          group-focus:bg-third group-focus:text-white
-        "
+    <div className="group relative inline-flex items-center" tabIndex={0}>
+      <span
+        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-line)] bg-white/75 text-sm font-bold text-[color:var(--color-accent-strong)] shadow-[0_8px_20px_rgba(31,95,114,0.08)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-[color:rgba(31,95,114,0.28)] group-hover:bg-white group-focus-within:border-[color:rgba(31,95,114,0.28)] group-focus-within:bg-white"
         aria-label="More information"
       >
-        i
+        ?
       </span>
 
-      {/* Tooltip popup */}
       <aside
         role="tooltip"
-        className="
-          absolute z-20 
-          invisible opacity-0
-          group-hover:visible group-hover:opacity-100
-          group-focus-within:visible group-focus-within:opacity-100
-          transition-all duration-200
-          bg-third text-white text-sm leading-relaxed
-          rounded-lg
-          px-4 py-3 
-          w-max max-w-[280px]
-          top-full left-1/2 -translate-x-1/2 mt-2
-          shadow-lg
-          before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2
-          before:border-8 before:border-transparent before:border-b-third
-        "
+        className="pointer-events-none absolute right-0 top-[calc(100%+0.8rem)] z-30 w-72 rounded-[1.1rem] border border-[color:var(--color-line)] bg-[rgba(255,252,247,0.97)] px-4 py-3 text-sm leading-relaxed text-[color:var(--color-ink-soft)] opacity-0 shadow-[0_24px_60px_rgba(28,40,58,0.18)] transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100 lg:w-80"
       >
-        <p className="m-0">{text}</p>
+        <p>{text}</p>
       </aside>
     </div>
   );

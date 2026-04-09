@@ -1,16 +1,6 @@
-/* ─────────────────────────────────────────────────────────── page.tsx ── */
-/*  Main “Home” route for the front‑end:                                     
-      1. calls FastAPI /parse → receives a Graph                            
-      2. derives logical formulas + pastel colours                          
-      3. renders input boxes  |  network graph  |  formula bubbles          */
-/*  NOTE:  every edge coming from the backend is given a unique `id` here   */
-/* ───────────────────────────────────────────────────────────────────────── */
-
 'use client';
 
-import { useState, useEffect } from 'react';
-
-/* ── local components ─────────────────────────────────────────────────── */
+import { useEffect, useState } from 'react';
 import TopBar from './Elements/TopBar';
 import NatrualLanguageBox from './Elements/natrualLanguageBox';
 import { SNLBox, Interaction } from './Elements/SNL/snlBox';
@@ -19,48 +9,37 @@ import LogicalFormulasContainer, {
   LogicalFormula as LF,
 } from './Elements/logicalFormulas/lfContainer';
 import { buildApiUrl } from '../lib/apiConfig';
-
-/* ── helpers ──────────────────────────────────────────────────────────── */
 import { buildLogicalFormulas } from './Elements/logicalFormulas/lfBuilder';
 
-/* ── Type definitions ─────────────────────────────────────────────────── */
 export type Graph = {
-  node: string;          // (unused for now)
+  node: string;
   edges: Interaction[];
 };
 
-/* ── pastel palette: golden‑angle sequence for distinct colours ───────── */
 const pastel = (idx: number) =>
-  `hsl(${(idx * 137.508) % 360} 70% 65%)`;   // pleasant pastels
+  `hsl(${(idx * 137.508) % 360} 58% 73%)`;
 
-/* ─────────────────────────────────────────────────────────────────────── */
 export default function Home() {
-  /* graph from the backend (or null before first fetch) */
   const [graph, setGraph] = useState<Graph | null>(null);
-
-  /* logical‑formulas derived from `graph` */
   const [lf, setLF] = useState<LF[]>([]);
-
-  /* gene → colour map shared by graph nodes & LF bubbles */
   const [geneColors, setGeneColors] = useState<Record<string, string>>({});
-
-  /* loading state for export button */
   const [isExporting, setIsExporting] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
 
-  /* ───── Export handler  ───── */
   function exportGinml() {
-    if (!graph || isExporting) return;    // nothing to export or already exporting
+    if (!graph || isExporting) return;
 
     setIsExporting(true);
     fetch(buildApiUrl("/api/export_ginml"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ graph, lf }),   // send current state
+      body: JSON.stringify({ graph, lf }),
     })
-      .then(res => res.blob())
-      .then(blob => {
+      .then((res) => res.blob())
+      .then((blob) => {
         const url = URL.createObjectURL(blob);
-        const a   = document.createElement("a");
+        const a = document.createElement("a");
         a.href = url;
         a.download = "model.ginml";
         a.click();
@@ -70,80 +49,63 @@ export default function Home() {
       .finally(() => setIsExporting(false));
   }
 
-
-
-  /* ───────────── API call & unique‑id injection ───────────── */
-  
-  
-
-  /* ─── rebuild formulas & colours whenever `graph` changes ── */
   useEffect(() => {
     setLF(buildLogicalFormulas(graph));
 
     if (graph) {
-      /* collect distinct gene names */
       const genes = new Set<string>();
-      graph.edges.forEach(e => {
+      graph.edges.forEach((e) => {
         genes.add(e.from);
         genes.add(e.to);
       });
 
-      /* assign each gene a pastel colour once */
       const cmap: Record<string, string> = {};
       [...genes].forEach((g, i) => (cmap[g] = pastel(i)));
       setGeneColors(cmap);
+    } else {
+      setGeneColors({});
     }
   }, [graph]);
 
-  /* fallback graph for SNLBox before fetch completes */
   const emptyGraph: Graph = { node: '', edges: [] };
+  const hasGraph = Boolean(graph?.edges.length);
 
-  /* ────────────────────────── JSX ─────────────────────────── */
   return (
-    <div className="min-h-screen bg-main flex flex-col">
-      {/* Header */}
+    <div className="app-shell min-h-screen text-foreground">
       <TopBar />
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col">
-        {/* Input section: Natural Language + SNL Editor */}
-        <section 
-          className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-2 h-[450px]"
-          aria-label="Input section"
-        >
-          <NatrualLanguageBox fun={setGraph} graph={graph} />
-          <SNLBox 
-            graph={graph ?? emptyGraph} 
+      <main className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 pb-8 pt-4 sm:px-6 lg:gap-8 lg:px-10 lg:pb-10">
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.9fr]">
+          <NatrualLanguageBox
+            fun={setGraph}
+            graph={graph}
+            isParsing={isParsing}
+            isOptimizing={isOptimizing}
+            setIsParsing={setIsParsing}
+            setIsOptimizing={setIsOptimizing}
+          />
+          <SNLBox
+            graph={graph ?? emptyGraph}
             setGeneList={setGraph}
             geneColors={geneColors}
           />
         </section>
 
-        {/* Divider */}
-        <div className="h-px bg-third/20 mx-6" role="separator" aria-hidden="true" />
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(330px,0.8fr)]">
+          <GeneNetworkGraph
+            graph={graph}
+            geneColors={geneColors}
+            isBusy={isParsing || isOptimizing}
+          />
 
-        {/* Output section: Graph + Logical Formulas */}
-        <section 
-          className="flex-1 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-0 lg:gap-2"
-          aria-label="Output section"
-        >
-          <GeneNetworkGraph graph={graph} geneColors={geneColors} />
-
-          <aside 
-            className="
-              overflow-y-auto max-h-[700px] 
-              custom-scrollbar
-              border-l border-third/10
-            " 
-            tabIndex={0}
-            aria-label="Logical formulas panel"
-          >
+          <aside className="animate-enter animate-delay-2 min-h-[320px]">
             <LogicalFormulasContainer
               lf={lf}
               setLF={setLF}
               geneColors={geneColors}
               onExport={exportGinml}
               isExporting={isExporting}
+              hasGraph={hasGraph}
             />
           </aside>
         </section>
@@ -151,4 +113,3 @@ export default function Home() {
     </div>
   );
 }
-/* ─────────────────────────────────────────────────────────────────────── */
