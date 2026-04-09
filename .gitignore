@@ -3,9 +3,14 @@
 # Directories
 /SpaCyEnv
 .env
+.env.local
+.env.backend.local
+.venv
 #/backend/graphOutputs
 
 #Caches
+__pycache__/
+*.py[cod]
 /backend/parser/__pycache__
 /backend/nlp/__pycache__
 /backend/__pycache__
@@ -22,3 +27,5 @@
 
 /nginx/logs/*         
 !/nginx/logs/.gitkeep 
+
+.vscode/

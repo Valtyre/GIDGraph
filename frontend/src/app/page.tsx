@@ -18,6 +18,7 @@ import GeneNetworkGraph from './Elements/graph';
 import LogicalFormulasContainer, {
   LogicalFormula as LF,
 } from './Elements/logicalFormulas/lfContainer';
+import { buildApiUrl } from '../lib/apiConfig';
 
 /* ── helpers ──────────────────────────────────────────────────────────── */
 import { buildLogicalFormulas } from './Elements/logicalFormulas/lfBuilder';
@@ -43,11 +44,15 @@ export default function Home() {
   /* gene → colour map shared by graph nodes & LF bubbles */
   const [geneColors, setGeneColors] = useState<Record<string, string>>({});
 
+  /* loading state for export button */
+  const [isExporting, setIsExporting] = useState(false);
+
   /* ───── Export handler  ───── */
   function exportGinml() {
-    if (!graph) return;                   // nothing to export yet
+    if (!graph || isExporting) return;    // nothing to export or already exporting
 
-    fetch("https://api.gidgraph.com/api/export_ginml", {
+    setIsExporting(true);
+    fetch(buildApiUrl("/api/export_ginml"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ graph, lf }),   // send current state
@@ -61,7 +66,8 @@ export default function Home() {
         a.click();
         URL.revokeObjectURL(url);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setIsExporting(false));
   }
 
 
@@ -102,7 +108,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         {/* Input section: Natural Language + SNL Editor */}
         <section 
-          className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-2 min-h-[400px]"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-2 h-[450px]"
           aria-label="Input section"
         >
           <NatrualLanguageBox fun={setGraph} graph={graph} />
@@ -137,6 +143,7 @@ export default function Home() {
               setLF={setLF}
               geneColors={geneColors}
               onExport={exportGinml}
+              isExporting={isExporting}
             />
           </aside>
         </section>

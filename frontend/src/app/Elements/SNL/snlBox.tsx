@@ -28,7 +28,6 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
   
   const [geneList, nodes] = [graph.edges , graph.node]
   const uniqueID = useRef(geneList.length+1);
-  const interactionTemplate = {from: "", label: InteractionType.activation, to: "", id: uniqueID.current++}
 
   function flipInteraction(interaction: Interaction): void {
     const snl = [...geneList];
@@ -72,7 +71,13 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
   }
 
   function addInteraction(){
-      createInteraction(interactionTemplate)
+    const newInteraction = {
+      from: "", 
+      label: InteractionType.activation, 
+      to: "", 
+      id: uniqueID.current++
+    };
+    createInteraction(newInteraction);
   }
 
   function removeInteraction(i: Interaction): void {
@@ -114,11 +119,11 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
 
   return (
     <section 
-      className="flex flex-col w-full p-5 lg:p-6"
+      className="flex flex-col w-full h-full p-5 lg:p-6 overflow-hidden"
       role="region"
       aria-labelledby="snl-title"
     >
-      <h2 id="snl-title" className="section-heading text-2xl lg:text-3xl">
+      <h2 id="snl-title" className="section-heading text-2xl lg:text-3xl flex-shrink-0">
         Semi-Natural Language
         <Infobox text={info}/>
       </h2>
@@ -126,7 +131,7 @@ export function SNLBox({graph, setGeneList, geneColors}: SNLBoxProps) {
       <div 
         className="
           flex flex-col gap-3 p-4
-          h-full overflow-y-auto
+          flex-1 min-h-0 overflow-y-auto
           bg-off border-2 border-third/30 
           rounded-lg
           custom-scrollbar

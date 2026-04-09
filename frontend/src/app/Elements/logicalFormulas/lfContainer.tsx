@@ -19,9 +19,10 @@ type LogicalFormulasContainerProps = {
   setLF: React.Dispatch<React.SetStateAction<LogicalFormula[]>>;
   geneColors: Record<string, string>;
   onExport: () => void;
+  isExporting?: boolean;
 };
 
-export default function LogicalFormulasContainer({lf, setLF, geneColors, onExport}: LogicalFormulasContainerProps) {
+export default function LogicalFormulasContainer({lf, setLF, geneColors, onExport, isExporting = false}: LogicalFormulasContainerProps) {
   /* toggle function passed down to each bubble */
   const toggleConnector = (targetGene: string, idx: number) => {
     setLF((prev) =>
@@ -79,7 +80,7 @@ export default function LogicalFormulasContainer({lf, setLF, geneColors, onExpor
               />
             ))}
           </div>
-          <ExportButton onExport={onExport} />
+          <ExportButton onExport={onExport} isLoading={isExporting} />
         </>
       )}
     </section>
