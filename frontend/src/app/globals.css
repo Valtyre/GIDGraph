@@ -44,6 +44,8 @@
      Special action buttons */
   --color-export: #529CCB;
   --color-export-hover: #468BB3;
+  --color-secondary: #6b7280;
+  --color-secondary-hover: #4b5563;
 
   /* ─── Spacing Scale ───────────────────────────────────────────────────────
      Consistent spacing (based on 4px grid) */
@@ -170,6 +172,15 @@ html, body, #root {
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-700);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-secondary-hover);
 }
 
 .btn-activation {

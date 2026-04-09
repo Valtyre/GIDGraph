@@ -37,6 +37,8 @@ ACTIVATION_VERBS = (
     "upregulate",
     "increases",
     "increase",
+    "stimulates",
+    "stimulate",
 )
 INHIBITION_VERBS = (
     "inhibits",
@@ -52,29 +54,18 @@ INHIBITION_VERBS = (
     "downregulates",
     "downregulate",
 )
-RELATION_VERBS = ("activates", "inhibits", "binds", "leads to")
+PASSIVE_ACTIVATION_WORDS = ("increased", "enhanced", "activated", "induced", "promoted", "upregulated")
+PASSIVE_INHIBITION_WORDS = ("repressed", "reduced", "decreased", "suppressed", "downregulated", "lost", "absent")
 TRAILING_CONTEXT_TOKENS = {
-    "cm",
-    "cms",
-    "cell",
-    "cells",
-    "ventricle",
-    "ventricles",
-    "ventricular",
-    "atrial",
-    "cardiac",
-    "derived",
-    "human",
-    "induced",
-    "pluripotent",
-    "stem",
-    "mice",
-    "mouse",
-    "in",
-    "of",
-    "the",
-    "a",
-    "an",
+    "cm", "cms", "cell", "cells", "ventricle", "ventricles", "ventricular", "atrial",
+    "cardiac", "derived", "human", "induced", "pluripotent", "stem", "mice", "mouse",
+    "in", "of", "the", "a", "an", "development", "heart", "hearts", "progenitors",
+    "transcription", "activity",
+}
+GENERIC_INVALID_TOKENS = {
+    "knockout", "mutant", "signalling", "signaling", "expression", "promoter", "loci",
+    "genes", "gene", "transcription", "cells", "cell", "ventricles", "ventricle",
+    "proteins", "protein", "elements", "regions", "sites",
 }
 
 SYSTEM_PROMPT = """You convert biological prose into short parser-friendly relation statements.
@@ -84,10 +75,12 @@ Rules:
 - Output one relation per sentence when possible.
 - Use only these relation verbs when possible: activates, inhibits, binds.
 - Use "X knockout inhibits Y" when the text says Y expression is lost/reduced in X knockout or X mutant conditions.
+- Preserve explicit regulation statements including expression increased/repressed by X.
 - Do not explain.
 - Do not summarize.
 - Do not include bullets.
 - Output plain sentences only.
+- Do not replace explicit genes with pronouns or generic terms.
 - Preserve every explicit relation you can infer directly from the text.
 - If a relation is ambiguous, omit it rather than guessing."""
 
@@ -130,10 +123,14 @@ def optimize_text(text: str) -> OptimizationResult:
         _log_rejection(cleaned_input, "", "", f"Ollama request failed: {exc}")
         return OptimizationResult(text=text, optimized=False, fallback=True)
 
-    sanitized_output = _sanitize_output(raw_output)
-    kept_sentences, dropped_reasons = _extract_valid_sentences(sanitized_output)
+    sanitized_output = _sanitize_text(raw_output)
+    original_relations, original_dropped = _extract_valid_relations(cleaned_input)
+    optimized_relations, optimized_dropped = _extract_valid_relations(sanitized_output)
 
-    if not kept_sentences:
+    merged = _merge_relations(original_relations, optimized_relations)
+    dropped_reasons = [*original_dropped, *optimized_dropped]
+
+    if not merged:
         _log_rejection(
             cleaned_input,
             raw_output,
@@ -143,14 +140,9 @@ def optimize_text(text: str) -> OptimizationResult:
         return OptimizationResult(text=text, optimized=False, fallback=True)
 
     if dropped_reasons:
-        _log_rejection(
-            cleaned_input,
-            raw_output,
-            sanitized_output,
-            "; ".join(dropped_reasons),
-        )
+        _log_rejection(cleaned_input, raw_output, sanitized_output, "; ".join(dropped_reasons))
 
-    return OptimizationResult(text=" ".join(kept_sentences), optimized=True, fallback=False)
+    return OptimizationResult(text=" ".join(merged), optimized=True, fallback=False)
 
 
 def _request_ollama(base_url: str, model: str, text: str, timeout: float) -> str:
@@ -159,10 +151,7 @@ def _request_ollama(base_url: str, model: str, text: str, timeout: float) -> str
         json={
             "model": model,
             "stream": False,
-            "options": {
-                "temperature": 0,
-                "top_p": 1,
-            },
+            "options": {"temperature": 0, "top_p": 1},
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": USER_PROMPT_TEMPLATE.format(text=text)},
@@ -175,27 +164,27 @@ def _request_ollama(base_url: str, model: str, text: str, timeout: float) -> str
     return payload["message"]["content"]
 
 
-def _sanitize_output(output: str) -> str:
-    text = output.strip()
-    text = re.sub(r"```(?:text)?", "", text, flags=re.IGNORECASE)
-    text = text.replace("```", "")
-    text = re.sub(r"(^|\s)([-*•]|\d+\.)\s+", r"\1", text)
-    text = re.sub(r"([a-z)])\.([A-Z])", r"\1. \2", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    text = re.sub(r"\s+\.", ".", text)
-    return text
+def _sanitize_text(text: str) -> str:
+    sanitized = text.strip()
+    sanitized = re.sub(r"```(?:text)?", "", sanitized, flags=re.IGNORECASE)
+    sanitized = sanitized.replace("```", "")
+    sanitized = re.sub(r"(^|\s)([-*•]|\d+\.)\s+", r"\1", sanitized)
+    sanitized = re.sub(r"([a-z)])\.([A-Z])", r"\1. \2", sanitized)
+    sanitized = re.sub(r"\s+", " ", sanitized).strip()
+    sanitized = re.sub(r"\s+\.", ".", sanitized)
+    return sanitized
 
 
-def _extract_valid_sentences(text: str) -> tuple[list[str], list[str]]:
+def _extract_valid_relations(text: str) -> tuple[list[str], list[str]]:
     kept: list[str] = []
     dropped: list[str] = []
 
     for sentence in _split_candidate_sentences(text):
-        normalized_sentences, reason = _normalize_sentence(sentence)
-        if normalized_sentences:
-            for normalized in normalized_sentences:
-                if _is_valid_sentence(normalized) and normalized not in kept:
-                    kept.append(normalized)
+        relations, reason = _extract_relations_from_sentence(sentence)
+        if relations:
+            for relation in relations:
+                if _is_valid_sentence(relation) and relation not in kept:
+                    kept.append(relation)
         elif reason:
             dropped.append(f"dropped sentence: {reason}: {sentence.strip()}")
 
@@ -203,12 +192,13 @@ def _extract_valid_sentences(text: str) -> tuple[list[str], list[str]]:
 
 
 def _split_candidate_sentences(text: str) -> list[str]:
-    if not text:
+    sanitized = _sanitize_text(text)
+    if not sanitized:
         return []
-    return [sentence.strip() for sentence in re.split(r"(?<=\.)\s+", text) if sentence.strip()]
+    return [sentence.strip() for sentence in re.split(r"(?<=\.)\s+", sanitized) if sentence.strip()]
 
 
-def _normalize_sentence(sentence: str) -> tuple[list[str], str | None]:
+def _extract_relations_from_sentence(sentence: str) -> tuple[list[str], str | None]:
     cleaned = sentence.strip()
     if not cleaned:
         return [], None
@@ -220,98 +210,200 @@ def _normalize_sentence(sentence: str) -> tuple[list[str], str | None]:
     cleaned = cleaned.rstrip(".").strip()
     cleaned = _strip_context_prefix(cleaned)
     cleaned = re.sub(r"\([^)]*\)", "", cleaned)
-    cleaned = re.sub(r"\bexpression of\s+", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bgene expression\b", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bexpression\b", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bgene\b", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bdirectly\s+", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\balso\s+", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bboth\s+", "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r",", " ", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip(" ,;:")
 
-    knockout_relations = _normalize_knockout_sentence(cleaned)
-    if knockout_relations:
-        return knockout_relations, None
+    clauses = _split_relation_clauses(cleaned)
+    relations: list[str] = []
+    reasons: list[str] = []
+    for clause in clauses:
+        clause_relations, reason = _extract_clause_relations(clause)
+        if clause_relations:
+            for relation in clause_relations:
+                if relation not in relations:
+                    relations.append(relation)
+        elif reason:
+            reasons.append(reason)
 
-    cleaned = re.sub(r"\bbinds to genomic loci of\b", "binds", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bbinds promoter of\b", "binds", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\bbinds to\b", "binds", cleaned, flags=re.IGNORECASE)
+    if relations:
+        return relations, None
+    if reasons:
+        return [], reasons[0]
+    return [], "no supported relation found"
 
-    for verb in ACTIVATION_VERBS:
-        cleaned = re.sub(rf"\b{re.escape(verb)}\b", "activates", cleaned, flags=re.IGNORECASE)
-    for verb in INHIBITION_VERBS:
-        cleaned = re.sub(rf"\b{re.escape(verb)}\b", "inhibits", cleaned, flags=re.IGNORECASE)
 
-    cleaned = re.sub(r"\s+", " ", cleaned).strip(" ,;:")
-
-    relation_match = re.match(
-        r"^(.+?)\s+(activates|inhibits|binds|leads to)\s+(.+)$",
-        cleaned,
-        flags=re.IGNORECASE,
-    )
-    if not relation_match:
-        return [], "no supported relation verb after normalization"
-
-    source_text, relation, target_text = relation_match.groups()
-    sources = _expand_gene_list(source_text)
-
-    if not sources:
-        return [], "unsupported multi-gene structure in source"
-
-    self_relation_targets = _normalize_self_relation_targets(target_text, relation, sources)
-    if self_relation_targets:
-        return self_relation_targets, None
-
-    targets = _expand_gene_list(target_text)
-    if not targets:
-        return [], "ambiguous non-gene target"
-
-    sentences = [
-        f"{source} {relation.lower()} {target}."
-        for source in sources
-        for target in targets
+def _split_relation_clauses(cleaned: str) -> list[str]:
+    clauses = [cleaned]
+    splitters = [
+        r"\s+and expression is\s+",
+        r"\s+and HEY2 expression is\s+",
+        r"\s+and MYL7 expression is\s+",
     ]
-    return sentences, None
+    for splitter in splitters:
+        next_clauses: list[str] = []
+        for clause in clauses:
+            next_clauses.extend([part.strip() for part in re.split(splitter, clause, flags=re.IGNORECASE) if part.strip()])
+        clauses = next_clauses
+    return clauses
 
 
-def _normalize_self_relation_targets(target_text: str, relation: str, sources: list[str]) -> list[str]:
-    lowered_target = target_text.strip().lower().rstrip(".")
-    self_patterns = (
-        "itself",
-        "its own expression",
-        "its own promoter",
-    )
+def _extract_clause_relations(clause: str) -> tuple[list[str], str | None]:
+    passive_knockout = _extract_knockout_relations(clause)
+    if passive_knockout:
+        return passive_knockout, None
 
-    if lowered_target not in self_patterns:
-        return []
+    loss_knockout = _extract_loss_of_relations(clause)
+    if loss_knockout:
+        return loss_knockout, None
 
-    return [f"{source} {relation.lower()} {source}." for source in sources]
+    passive_expression = _extract_passive_expression_relations(clause)
+    if passive_expression:
+        return passive_expression, None
+
+    active_relations = _extract_active_voice_relations(clause)
+    if active_relations:
+        return active_relations, None
+
+    return [], "no supported relation verb after normalization"
 
 
-def _normalize_knockout_sentence(cleaned: str) -> list[str]:
-    source_pattern = r"([A-Za-z][A-Za-z0-9/-]*)"
-    knockout_patterns = [
-        rf"^([A-Za-z][A-Za-z0-9/-]*)\s+is\s+(?:lost|absent|reduced|decreased)\s+by\s+{source_pattern}(?:\s+(?:knockout|mutant))(?:\b.*)?$",
-        rf"^([A-Za-z][A-Za-z0-9/-]*)\s+is\s+(?:lost|absent|reduced|decreased)\s+in\s+{source_pattern}(?:\s+(?:knockout|mutant))(?:\b.*)?$",
+def _extract_knockout_relations(clause: str) -> list[str]:
+    patterns = [
+        r"^([A-Za-z][A-Za-z0-9/-]*)\s+(?:expression\s+)?is\s+(?:lost|absent|reduced|decreased)\s+by\s+([A-Za-z][A-Za-z0-9/-]*)(?:\s+(?:knockout|mutant))(?:\b.*)?$",
+        r"^([A-Za-z][A-Za-z0-9/-]*)\s+(?:expression\s+)?is\s+(?:lost|absent|reduced|decreased)\s+in\s+([A-Za-z][A-Za-z0-9/-]*)(?:\s+(?:knockout|mutant))(?:\b.*)?$",
+        r"^expression of\s+([A-Za-z][A-Za-z0-9/-]*)\s+is\s+(?:lost|absent|reduced|decreased)\s+by\s+([A-Za-z][A-Za-z0-9/-]*)(?:\s+(?:knockout|mutant))(?:\b.*)?$",
+        r"^expression of\s+([A-Za-z][A-Za-z0-9/-]*)\s+is\s+(?:lost|absent|reduced|decreased)\s+in\s+([A-Za-z][A-Za-z0-9/-]*)(?:\s+(?:knockout|mutant))(?:\b.*)?$",
     ]
-
-    for pattern in knockout_patterns:
-        match = re.match(pattern, cleaned, flags=re.IGNORECASE)
+    for pattern in patterns:
+        match = re.match(pattern, clause, flags=re.IGNORECASE)
         if match:
             target, source = match.groups()
-            return [f"{source} knockout inhibits {target}."]
-
+            target_gene = _canonical_gene(target)
+            source_gene = _canonical_gene(source)
+            if target_gene and source_gene:
+                return [f"{source_gene} knockout inhibits {target_gene}."]
     knockout_relation_match = re.match(
         r"^([A-Za-z][A-Za-z0-9/-]*)\s+knockout\s+(inhibits|leads to)\s+([A-Za-z][A-Za-z0-9/-]*)$",
-        cleaned,
+        clause,
         flags=re.IGNORECASE,
     )
     if knockout_relation_match:
         source, relation, target = knockout_relation_match.groups()
-        return [f"{source} knockout {relation.lower()} {target}."]
-
+        source_gene = _canonical_gene(source)
+        target_gene = _canonical_gene(target)
+        if source_gene and target_gene:
+            return [f"{source_gene} knockout {relation.lower()} {target_gene}."]
     return []
+
+
+def _extract_loss_of_relations(clause: str) -> list[str]:
+    match = re.match(
+        r"^loss of\s+([A-Za-z][A-Za-z0-9/-]*)\s+leads to\s+(?:decreased|reduced|lost|absent)\s+(?:expression of\s+)?([A-Za-z][A-Za-z0-9/-]*)$",
+        clause,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return []
+    source, target = match.groups()
+    source_gene = _canonical_gene(source)
+    target_gene = _canonical_gene(target)
+    if source_gene and target_gene:
+        return [f"{source_gene} knockout inhibits {target_gene}."]
+    return []
+
+
+def _extract_passive_expression_relations(clause: str) -> list[str]:
+    passive_patterns = [
+        r"^expression of\s+(.+?)\s+is\s+([A-Za-z-]+)\s+by\s+(.+)$",
+        r"^(.+?)\s+expression\s+is\s+([A-Za-z-]+)\s+by\s+(.+)$",
+    ]
+    for pattern in passive_patterns:
+        match = re.match(pattern, clause, flags=re.IGNORECASE)
+        if not match:
+            continue
+        target_text, relation_word, source_text = match.groups()
+        relation = _relation_from_passive_word(relation_word)
+        if relation is None:
+            return []
+        sources = _expand_gene_list(_strip_signal_suffix(source_text))
+        targets = _expand_gene_list(target_text)
+        if not sources:
+            return []
+        if not targets:
+            return []
+        return [f"{source} {relation} {target}." for source in sources for target in targets]
+    return []
+
+
+def _extract_active_voice_relations(clause: str) -> list[str]:
+    normalized = clause
+    normalized = re.sub(r"\bbinds to genomic loci of\b", "binds", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bbinds promoter of\b", "binds", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bbinds to regulatory regions of\b", "binds", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bbinds to\b", "binds", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bexpression of\s+", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bgene expression\b", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bexpression\b", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bgene\b", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bdirectly\s+", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\balso\s+", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\bboth\s+", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\s+", " ", normalized).strip(" ,;:")
+
+    for verb in ACTIVATION_VERBS:
+        normalized = re.sub(rf"\b{re.escape(verb)}\b", "activates", normalized, flags=re.IGNORECASE)
+    for verb in INHIBITION_VERBS:
+        normalized = re.sub(rf"\b{re.escape(verb)}\b", "inhibits", normalized, flags=re.IGNORECASE)
+
+    match = re.match(
+        r"^(.+?)\s+(activates|inhibits|binds|leads to)\s+(.+)$",
+        normalized,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return []
+
+    source_text, relation, target_text = match.groups()
+    sources = _expand_gene_list(_strip_signal_suffix(source_text))
+    if not sources:
+        return []
+
+    self_targets = _normalize_self_relation_targets(target_text, relation, sources)
+    if self_targets:
+        return self_targets
+
+    cleaned_target_text = re.split(r"\s+and\s+expression\s+is\s+", target_text, maxsplit=1, flags=re.IGNORECASE)[0]
+    targets = _expand_gene_list(cleaned_target_text)
+    if not targets:
+        return []
+    if any(target.lower() in GENERIC_INVALID_TOKENS for target in targets):
+        return []
+
+    return [f"{source} {relation.lower()} {target}." for source in sources for target in targets]
+
+
+def _normalize_self_relation_targets(target_text: str, relation: str, sources: list[str]) -> list[str]:
+    lowered_target = target_text.strip().lower().rstrip(".")
+    self_patterns = ("itself", "its own expression", "its own promoter")
+    if lowered_target not in self_patterns:
+        return []
+    return [f"{source} {relation.lower()} {source}." for source in sources]
+
+
+def _relation_from_passive_word(word: str) -> str | None:
+    lowered = word.lower()
+    if lowered in PASSIVE_ACTIVATION_WORDS:
+        return "activates"
+    if lowered in PASSIVE_INHIBITION_WORDS:
+        return "inhibits"
+    return None
+
+
+def _strip_signal_suffix(text: str) -> str:
+    cleaned = text.strip()
+    cleaned = re.sub(r"\b(signalling|signaling)\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" ,;:")
+    return cleaned
 
 
 def _expand_gene_list(text: str) -> list[str]:
@@ -321,7 +413,6 @@ def _expand_gene_list(text: str) -> list[str]:
     cleaned = cleaned.strip(" ,;:")
     if not cleaned:
         return []
-
     parts = re.split(r"\s+(?:and|or)\s+", cleaned, flags=re.IGNORECASE)
     genes: list[str] = []
     for part in parts:
@@ -345,9 +436,22 @@ def _extract_gene_token(text: str) -> str | None:
         return None
 
     for token in reversed(tokens):
-        if re.fullmatch(r"[A-Za-z][A-Za-z0-9/-]*", token):
-            return token
+        gene = _canonical_gene(token)
+        if gene:
+            return gene
+    return None
 
+
+def _canonical_gene(token: str) -> str | None:
+    cleaned = token.strip(" ,;:.")
+    cleaned = re.sub(r"\b(signalling|signaling)\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if not cleaned:
+        return None
+    if cleaned.lower() in GENERIC_INVALID_TOKENS:
+        return None
+    if re.fullmatch(r"[A-Za-z][A-Za-z0-9/-]*", cleaned):
+        return cleaned
     return None
 
 
@@ -363,6 +467,15 @@ def _strip_context_prefix(text: str) -> str:
     return cleaned
 
 
+def _merge_relations(*relation_groups: list[str]) -> list[str]:
+    merged: list[str] = []
+    for group in relation_groups:
+        for relation in group:
+            if relation not in merged:
+                merged.append(relation)
+    return merged
+
+
 def _is_valid_sentence(sentence: str) -> bool:
     return any(pattern.fullmatch(sentence) for pattern in CANONICAL_RELATION_PATTERNS)
 
@@ -370,7 +483,6 @@ def _is_valid_sentence(sentence: str) -> bool:
 def _log_rejection(original_input: str, raw_output: str, sanitized_output: str, reason: str) -> None:
     if os.getenv("OPTIMIZER_LOG_REJECTIONS", "").strip().lower() != "true":
         return
-
     logger.warning(
         "Rejected or partially accepted optimizer output. reason=%s\ninput=%s\nraw_output=%s\nsanitized_output=%s",
         reason,
