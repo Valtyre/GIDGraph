@@ -71,10 +71,15 @@ Restart the frontend dev server after changing any `NEXT_PUBLIC_*` value.
 
 ### 3. Start the frontend website
 
-Run this from the `frontend` directory:
+Run this from the repo root:
 
 ```powershell
-cd c:\Users\chrwa\Documents\GitHub\GIDGraph\frontend
+cd frontend
+npm run dev
+```
+
+```bash
+cd frontend
 npm run dev
 ```
 
