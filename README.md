@@ -93,4 +93,20 @@ The frontend will be available at `http://localhost:3000`.
 
 Open `http://localhost:3000` in your browser.
 
+## Windows home hosting
+
+To re-establish the previous public deployment shape on a Windows machine:
+
+- read [`docs/windows-home-hosting.md`](docs/windows-home-hosting.md)
+- launch the backend with `powershell -ExecutionPolicy Bypass -File .\scripts\run-backend.ps1`
+- inspect network, DNS, and local port state with `powershell -ExecutionPolicy Bypass -File .\scripts\check-home-hosting.ps1`
+- optionally create Windows firewall rules with `powershell -ExecutionPolicy Bypass -File .\scripts\open-firewall-ports.ps1`
+
+This workflow matches the repo's existing deployment assumptions:
+
+- `https://www.gidgraph.com` for the frontend
+- `https://api.gidgraph.com` for the backend
+- FastAPI on `127.0.0.1:8000`
+- Windows Nginx on `80` and `443`
+
 Created by Christian Wantzin & Valtýr Ellidi Einarsson
